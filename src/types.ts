@@ -6,7 +6,7 @@ export interface Cache<T> {
      * get cached data
      * @param key
      */
-    get(key: string): Promise<T | null | undefined>;
+    get(key: string): Promise<T | undefined>;
     /**
      * set data to cache
      * @param key
@@ -47,13 +47,21 @@ export enum CacheMode {
      */
     NoCache = 3,
     /**
-     * use local cache if it exists, , otherwise load from network and store result to cache
+     * use local cache if it exists, even it's expired, otherwise load from network and store result to cache
      */
     ForceCache = 4,
     /**
-     * use local cache result, throw errors on cache miss
+     * use local cache result, event it's expired
      */
     OnlyIfCached = 5,
+}
+
+export interface CachedData<T> {
+    data: T;
+    /**
+     * data received timestamp
+     */
+    timestamp: number;
 }
 
 /**
@@ -63,7 +71,7 @@ export interface FetcherOptions<T> {
     /**
      * cache
      */
-    cache: Cache<T>;
+    cache: Cache<CachedData<T>>;
     /**
      * default cache mode
      */
@@ -94,11 +102,11 @@ export type RequestOptions<T> = Omit<
      */
     cacheKey?: string;
     /**
-     *
+     * TODO: not supported yet
      */
     pollingInterval?: number;
     /**
-     *
+     * TODO: not supported yet
      */
     shouldRetryOnError?: boolean;
 };
@@ -106,7 +114,7 @@ export type RequestOptions<T> = Omit<
 /**
  * Response data structure for a fetch request
  */
-export interface FetcherResponse<T> {
+export interface RequestResponse<T> {
     /**
      * data returned by request
      */
@@ -114,7 +122,10 @@ export interface FetcherResponse<T> {
     /**
      * followed up response. swr, polling
      */
-    next?: Promise<FetcherResponse<T>>;
+    next?: Promise<RequestResponse<T>>;
+    /**
+     *
+     */
     error?: Error;
 }
 
@@ -123,7 +134,7 @@ export interface FetcherResponse<T> {
  */
 export interface RequestReturn<T> {
     abort: () => void;
-    response: Promise<FetcherResponse<T>>;
+    response: Promise<RequestResponse<T>>;
 }
 
 /**
@@ -134,7 +145,11 @@ export interface Fetcher<T, R = void> {
     config(options: FetcherOptions<T>);
 }
 
+export interface RequestContext {
+    signal: AbortSignal;
+}
+
 /**
  *
  */
-export type RequestCreator<T, R = void> = (request?: R) => Promise<T>;
+export type RequestCreator<T, R = void> = (request: R, context: RequestContext) => Promise<T>;

@@ -60,7 +60,7 @@ export function withMemoryCache<T>(cache: Cache<T>): Cache<T> {
 class DummyCache<T> implements Cache<T> {
     private keys = new Set<string>();
 
-    get(key: string): Promise<T | null | undefined> {
+    get(key: string): Promise<T | undefined> {
         return Promise.resolve(undefined);
     }
 
@@ -81,6 +81,6 @@ class DummyCache<T> implements Cache<T> {
     }
 }
 
-export default function createMemoryCache<T>() {
+export default function createMemoryCache<T>(): Cache<T> {
     return withMemoryCache(new DummyCache());
 }

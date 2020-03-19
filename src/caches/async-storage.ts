@@ -8,11 +8,11 @@ class AsyncStorageCache<T> implements Cache<T> {
     // keep a local cache of all keys
     private keys: Set<string>;
 
-    constructor(private keyPrefix: string) {
+    constructor(keyPrefix: string) {
         this.prefixHelper = new KeyPrefixHelper(keyPrefix);
     }
 
-    get(key: string): Promise<T | null | undefined> {
+    get(key: string): Promise<T | undefined> {
         if (this.keys && !this.keys.has(key)) {
             return Promise.resolve(undefined);
         }
@@ -75,7 +75,7 @@ class AsyncStorageCache<T> implements Cache<T> {
 export default function createAsyncStorageCache<T>(
     keyPrefix: string = defaultPrefix,
     useMemoryCache: boolean = true,
-) {
+): Cache<T> {
     const cache = new AsyncStorageCache<T>(keyPrefix);
     return useMemoryCache ? withMemoryCache(cache) : cache;
 }

@@ -29,7 +29,7 @@ const handleUserInfo = ({ data, next, error }) => {
 
 }
 
-userInfoFetcher(1).then(handleUserInfo);
+userInfoFetcher.fetch(1).then(handleUserInfo);
 ```
 
 ### React Hooks
