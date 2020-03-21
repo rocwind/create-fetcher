@@ -124,7 +124,7 @@ export interface RequestResponse<T> {
      */
     next?: Promise<RequestResponse<T>>;
     /**
-     *
+     * errors won't be Promise reject but resolved with error here
      */
     error?: Error;
 }
@@ -133,23 +133,46 @@ export interface RequestResponse<T> {
  *
  */
 export interface RequestReturn<T> {
+    /**
+     * abort current request
+     */
     abort: () => void;
+    /**
+     * response promise
+     */
     response: Promise<RequestResponse<T>>;
 }
 
 /**
- *
+ * Fetch instance
  */
 export interface Fetcher<T, R = void> {
+    /**
+     *
+     * @param request
+     * @param options
+     */
     fetch(request?: R, options?: RequestOptions<T>): RequestReturn<T>;
+    /**
+     * update fetcher options
+     * @param options
+     */
     config(options: FetcherOptions<T>);
 }
 
+/**
+ * Request context instance for request creator to consume
+ */
 export interface RequestContext {
+    /**
+     * AbortSignal that should be pass to native fetch() to support abort request
+     */
     signal: AbortSignal;
 }
 
 /**
- *
+ * Request creator method that handles the actual network request/calls native fetch()
+ * @param request the request params for each fetch instance
+ * @param context request context object instance created by fetcher
  */
 export type RequestCreator<T, R = void> = (request: R, context: RequestContext) => Promise<T>;

@@ -81,6 +81,6 @@ class DummyCache<T> implements Cache<T> {
     }
 }
 
-export default function createMemoryCache<T>(): Cache<T> {
+export function createMemoryCache<T>(): Cache<T> {
     return withMemoryCache(new DummyCache());
 }

@@ -7,7 +7,7 @@ import {
     RequestOptions,
     RequestResponse,
 } from './types';
-import createMemoryCache from './caches/memory';
+import { createMemoryCache } from './caches/memory';
 import { KeyPrefixHelper } from './caches/utils';
 
 const defaultOptions: FetcherOptions<any> = {
@@ -26,7 +26,7 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
 
     fetch(request: R, options?: RequestOptions<T>) {
         const mergedOptions = Object.assign({}, this.options, options);
-        const cacheKey = options.cacheKey ?? hash(request);
+        const cacheKey = options?.cacheKey ?? hash(request ?? null);
         if (!this.requestByKey.has(cacheKey)) {
             this.requestByKey.set(
                 cacheKey,
@@ -59,7 +59,7 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
     }
 }
 
-function throwAbortError(): RequestResponse<any> {
+function createAbortError(): RequestResponse<any> {
     const error = new Error('Aborted');
     error.name = 'AbortError';
     return { error };
@@ -88,7 +88,7 @@ class FetcherRequest<T, R> {
 
         this.response = this.cacheControl.get(this.cacheKey).then(data => {
             if (this.isAborted) {
-                return throwAbortError();
+                return createAbortError();
             }
             const response: RequestResponse<T> = {
                 data,
@@ -112,7 +112,7 @@ class FetcherRequest<T, R> {
                         response.next = this.requestCreator(this.request, { signal })
                             .then(data => {
                                 if (this.isAborted) {
-                                    return throwAbortError();
+                                    return createAbortError();
                                 }
                                 this.cacheControl.set(this.cacheKey, data);
                                 return { data };

@@ -72,7 +72,7 @@ class AsyncStorageCache<T> implements Cache<T> {
     }
 }
 
-export default function createAsyncStorageCache<T>(
+export function createAsyncStorageCache<T>(
     keyPrefix: string = defaultPrefix,
     useMemoryCache: boolean = true,
 ): Cache<T> {

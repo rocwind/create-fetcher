@@ -66,7 +66,7 @@ class LocalStorageCache<T> implements Cache<T> {
     }
 }
 
-export default function createLocalStorageCache<T>(
+export function createLocalStorageCache<T>(
     keyPrefix: string = defaultPrefix,
     useMemoryCache: boolean = true,
 ): Cache<T> {
