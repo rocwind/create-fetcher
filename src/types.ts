@@ -71,11 +71,11 @@ export interface FetcherOptions<T> {
     /**
      * cache
      */
-    cache: Cache<CachedData<T>>;
+    cache?: Cache<CachedData<T>>;
     /**
-     * default cache mode
+     * cache mode
      */
-    cacheMode: CacheMode;
+    cacheMode?: CacheMode;
     /**
      * key prefix
      */
