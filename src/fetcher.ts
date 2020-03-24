@@ -10,7 +10,7 @@ import {
 } from './types';
 import { createMemoryCache } from './caches/memory';
 import { KeyPrefixHelper } from './caches/utils';
-import { FetcherRequest } from './request';
+import { RequestFactory } from './requests/factory';
 
 const defaultOptions: FetcherOptions<any> = {
     cache: createMemoryCache(),
@@ -21,9 +21,10 @@ const defaultOptions: FetcherOptions<any> = {
 
 export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
     private options = Object.assign({}, defaultOptions);
-    private requestByKey = new Map<string, FetcherRequest<T, R>>();
-    constructor(private requestCreator: RequestCreator<T, R>, options: FetcherOptions<T>) {
+    private requestFactory: RequestFactory<T, R>;
+    constructor(requestCreator: RequestCreator<T, R>, options: FetcherOptions<T>) {
         this.config(options);
+        this.requestFactory = new RequestFactory(requestCreator);
     }
 
     config(options) {
@@ -44,33 +45,18 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
             ) as Promise<void>;
     }
 
-    fetch(request: R, options?: RequestOptions<T>) {
+    fetch(request?: R, options?: RequestOptions<T>) {
         const mergedOptions = Object.assign({}, this.options, options);
-        const cacheKey = options?.cacheKey ?? hash(request ?? null);
-        if (!this.requestByKey.has(cacheKey)) {
-            this.requestByKey.set(
-                cacheKey,
-                new FetcherRequest(cacheKey, request, this.requestCreator, mergedOptions),
-            );
-        }
-        const fetcherRequest = this.requestByKey.get(cacheKey);
-        const response = fetcherRequest.run();
-        // remove request from running map once it's fully settled
-        const onRequestSettled = ({ next }: RequestResponse<T>): void => {
-            if (next) {
-                next.then(onRequestSettled);
-            } else {
-                this.requestByKey.delete(cacheKey);
-            }
-        };
-        response.then(onRequestSettled);
+
+        const fetcherRequest = this.requestFactory.getRequest(mergedOptions, request);
+
         return {
             abort: () => {
                 // TODO: if request shared by multiple client,
                 // one client abort will cause others receive the abort error too
                 fetcherRequest.abort();
             },
-            response,
+            response: fetcherRequest.run(),
         };
     }
 }

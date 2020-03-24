@@ -56,6 +56,17 @@ export enum CacheMode {
     OnlyIfCached = 5,
 }
 
+export enum BackoffMode {
+    /**
+     * constant backoff, use the same wait time constantly
+     */
+    Constant = 0,
+    /**
+     * exponential backoff, increase wait time for each retry
+     */
+    Exponential = 1,
+}
+
 export interface CachedData<T> {
     data: T;
     /**
@@ -69,11 +80,11 @@ export interface CachedData<T> {
  */
 export interface FetcherOptions<T> {
     /**
-     * cache
+     * cache, default to memory cache
      */
     cache?: Cache<CachedData<T>>;
     /**
-     * cache mode
+     * cache mode, default to CacheMode.Default
      */
     cacheMode?: CacheMode;
     /**
@@ -81,11 +92,11 @@ export interface FetcherOptions<T> {
      */
     cacheKeyPrefix?: string;
     /**
-     * cache will still be fresh for at least the specified number of seconds
+     * cache will still be fresh for at least the specified number of seconds, default to 1s
      */
     cacheMinFresh?: number;
     /**
-     * max amount of time of a cache is considered fresh
+     * max amount of time of a cache is considered fresh, default to 3600s
      */
     cacheMaxAge?: number;
 }
@@ -102,13 +113,26 @@ export type RequestOptions<T> = Omit<
      */
     cacheKey?: string;
     /**
+     * turn on retry on error or not, default is false
+     */
+    retryOnError?: boolean;
+    /**
+     * max retry times, default is 3
+     */
+    retryTimes?: number;
+    /**
+     * backoff algorithm for retry wait interval, default is BackoffMode.Constant
+     */
+    retryBackoff?: BackoffMode;
+    /**
+     * initial wait time for retry in seconds, default is 1s
+     */
+    retryInitialWaitTime?: number;
+    /**
+     * polling interval
      * TODO: not supported yet
      */
     pollingInterval?: number;
-    /**
-     * TODO: not supported yet
-     */
-    shouldRetryOnError?: boolean;
 };
 
 /**

@@ -1,13 +1,11 @@
-import { RequestResponse, CacheMode, RequestCreator, FetcherOptions } from './types';
-import { KeyPrefixHelper } from './caches/utils';
+import { RequestResponse, CacheMode, RequestCreator, FetcherOptions } from '../types';
+import { KeyPrefixHelper } from '../caches/utils';
+import { FetcherRequest, createAbortError } from './utils';
 
-function createAbortError(): RequestResponse<any> {
-    const error = new Error('Aborted');
-    error.name = 'AbortError';
-    return { error };
-}
-
-export class FetcherRequest<T, R> {
+/**
+ * SWR request, handles request with cache
+ */
+export class SWRFetcherRequest<T, R> implements FetcherRequest<T, R> {
     private cacheControl: CacheControl<T>;
     private response: Promise<RequestResponse<T>>;
     private isAborted = false;
@@ -15,9 +13,9 @@ export class FetcherRequest<T, R> {
 
     constructor(
         private cacheKey: string,
-        private request: R,
         private requestCreator: RequestCreator<T, R>,
         private options: FetcherOptions<T>,
+        private request?: R,
     ) {
         this.cacheControl = new CacheControl(options);
     }
@@ -60,12 +58,7 @@ export class FetcherRequest<T, R> {
                                 return { data };
                             })
                             .catch(error => {
-                                // TODO: retry?
                                 return { error };
-                            })
-                            .then(res => {
-                                // TODO: cleanup ?
-                                return res;
                             });
                     }
                     break;
@@ -83,6 +76,9 @@ export class FetcherRequest<T, R> {
     }
 }
 
+/**
+ * cache control helper, handles SWR cache options
+ */
 class CacheControl<T> {
     private prefixHelper: KeyPrefixHelper;
     private timestampByKey = new Map<string, number>();
