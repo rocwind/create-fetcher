@@ -158,6 +158,10 @@ export interface Fetcher<T, R = void> {
      * @param options
      */
     config(options: FetcherOptions<T>);
+    /**
+     * clear cached responses
+     */
+    clearCache(): Promise<void>;
 }
 
 /**
