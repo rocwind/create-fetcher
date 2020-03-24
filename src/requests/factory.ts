@@ -1,37 +1,79 @@
 import hash from 'object-hash';
-import { FetcherOptions, RequestOptions, RequestCreator, RequestResponse } from '../types';
-import { FetcherRequest } from './utils';
+import { FetcherOptions, RequestOptions, RequestCreator } from '../types';
+import { FetcherRequest, RequestControl } from './utils';
 import { SWRFetcherRequest } from './swr';
 
 export class RequestFactory<T, R> {
-    private requestByKey = new Map<string, FetcherRequest<T, R>>();
+    private requestControl: RequestControl<T, R>;
 
-    constructor(private requestCreator: RequestCreator<T, R>) {}
+    constructor(requestCreator: RequestCreator<T, R>) {
+        this.requestControl = new RequestControlImpl(requestCreator);
+    }
 
-    getRequest(options: FetcherOptions<T> & RequestOptions<T>, request?: R): FetcherRequest<T, R> {
+    getRequest(options: FetcherOptions<T> & RequestOptions<T>, request?: R): FetcherRequest<T> {
         const cacheKey = options?.cacheKey ?? hash(request ?? null);
 
-        if (this.requestByKey.has(cacheKey)) {
-            return this.requestByKey.get(cacheKey);
-        }
-
         const fetcherRequest = new SWRFetcherRequest(
+            this.requestControl,
             cacheKey,
-            this.requestCreator,
             options,
             request,
         );
-        this.requestByKey.set(cacheKey, fetcherRequest);
 
-        // remove request from running map once it's fully settled
-        const onRequestSettled = ({ next }: RequestResponse<T>): void => {
-            if (next) {
-                next.then(onRequestSettled);
-            } else {
-                this.requestByKey.delete(cacheKey);
-            }
-        };
-        fetcherRequest.run().then(onRequestSettled);
         return fetcherRequest;
+    }
+}
+
+interface RequestInstance<T> {
+    response: Promise<T>;
+    refCount: number;
+    abortController?: AbortController;
+}
+class RequestControlImpl<T, R> implements RequestControl<T, R> {
+    private instanceByKey = new Map<string, RequestInstance<T>>();
+
+    constructor(private requestCreator: RequestCreator<T, R>) {}
+
+    getResponse(cacheKey: string, request?: R): Promise<T> {
+        let instance = this.instanceByKey.get(cacheKey);
+        if (!instance) {
+            let abortController: AbortController;
+            if (typeof AbortController !== 'undefined') {
+                abortController = new AbortController();
+            }
+            const signal = abortController?.signal;
+
+            instance = {
+                response: this.requestCreator(request, { signal }),
+                refCount: 0,
+                abortController,
+            };
+            this.instanceByKey.set(cacheKey, instance);
+
+            instance.response
+                .catch(() => {
+                    /* do nothing */
+                })
+                .then(() => {
+                    this.instanceByKey.delete(cacheKey);
+                });
+        }
+
+        instance.refCount += 1;
+        return instance.response;
+    }
+
+    release(cacheKey): void {
+        const instance = this.instanceByKey.get(cacheKey);
+        if (!instance) {
+            return;
+        }
+        instance.refCount -= 1;
+        if (instance.refCount === 0) {
+            this.instanceByKey.delete(cacheKey);
+            if (instance.abortController) {
+                instance.abortController.abort();
+            }
+        }
     }
 }

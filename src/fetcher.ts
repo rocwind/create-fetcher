@@ -52,8 +52,6 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
 
         return {
             abort: () => {
-                // TODO: if request shared by multiple client,
-                // one client abort will cause others receive the abort error too
                 fetcherRequest.abort();
             },
             response: fetcherRequest.run(),

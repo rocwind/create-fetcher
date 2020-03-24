@@ -1,19 +1,19 @@
 import { RequestResponse, CacheMode, RequestCreator, FetcherOptions } from '../types';
 import { KeyPrefixHelper } from '../caches/utils';
-import { FetcherRequest, createAbortError } from './utils';
+import { FetcherRequest, createAbortError, RequestControl } from './utils';
 
 /**
  * SWR request, handles request with cache
  */
-export class SWRFetcherRequest<T, R> implements FetcherRequest<T, R> {
+export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
     private cacheControl: CacheControl<T>;
     private response: Promise<RequestResponse<T>>;
+    private isRequestSent = false;
     private isAborted = false;
-    private abortController: AbortController;
 
     constructor(
+        private requestControl: RequestControl<T, R>,
         private cacheKey: string,
-        private requestCreator: RequestCreator<T, R>,
         private options: FetcherOptions<T>,
         private request?: R,
     ) {
@@ -44,13 +44,10 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T, R> {
                 default:
                     // check if cache is fresh and send request if it's not
                     if (!this.cacheControl.isFresh(this.cacheKey)) {
-                        if (typeof AbortController !== 'undefined') {
-                            this.abortController = new AbortController();
-                        }
-                        const signal = this.abortController?.signal;
-
-                        response.next = this.requestCreator(this.request, { signal })
+                        response.next = this.requestControl
+                            .getResponse(this.cacheKey, this.request)
                             .then(data => {
+                                // TODO: get abort reject earlier by not waiting response
                                 if (this.isAborted) {
                                     return createAbortError();
                                 }
@@ -60,6 +57,8 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T, R> {
                             .catch(error => {
                                 return { error };
                             });
+
+                        this.isRequestSent = true;
                     }
                     break;
             }
@@ -71,8 +70,13 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T, R> {
     }
 
     abort() {
+        if (this.isAborted) {
+            return;
+        }
         this.isAborted = true;
-        this.abortController?.abort();
+        if (this.isRequestSent) {
+            this.requestControl.release(this.cacheKey);
+        }
     }
 }
 
