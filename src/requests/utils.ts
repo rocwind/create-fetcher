@@ -15,3 +15,23 @@ export function createAbortError(): RequestResponse<any> {
     error.name = 'AbortError';
     return { error };
 }
+
+export interface PromiseWithControls<T> {
+    promise: Promise<T>;
+    resolve: (data?: T) => void;
+    reject: (err?: Error) => void;
+}
+
+export function createPromise<T>(): PromiseWithControls<T> {
+    let resolve;
+    let reject;
+    const promise = new Promise<T>((res, rej) => {
+        resolve = res;
+        reject = rej;
+    });
+    return {
+        promise,
+        resolve,
+        reject,
+    };
+}
