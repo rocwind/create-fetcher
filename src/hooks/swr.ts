@@ -49,7 +49,7 @@ export function useSWR<T, R = void>(
             }
 
             stateRef.current = Object.assign({}, stateRef.current, {
-                data,
+                data: data ?? stateRef.current.data,
                 error,
                 isLoading,
                 isValidating,
