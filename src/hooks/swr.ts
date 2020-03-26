@@ -40,10 +40,10 @@ export function useSWR<T, R = void>(
         // - fetch and handle the update
         const { abort, response } = fetcher.fetch(request, options);
         const handleResponse = ({ data, error, next }: RequestResponse<T>) => {
-            // loading: no data available
-            const isLoading = !data && !stateRef.current.data;
             // validating: has next request
             const isValidating = !!next;
+            // loading: no data available and validating
+            const isLoading = !data && !stateRef.current.data && isValidating;
             if (next) {
                 next.then(handleResponse);
             }
