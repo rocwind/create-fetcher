@@ -1,26 +1,31 @@
-import hash from 'object-hash';
 import {
     Fetcher,
     RequestCreator,
     FetcherOptions,
     CacheMode,
     RequestOptions,
-    RequestResponse,
     Cache,
+    BackoffMode,
 } from './types';
 import { createMemoryCache } from './caches/memory';
 import { KeyPrefixHelper } from './caches/utils';
 import { RequestFactory } from './requests/factory';
 
-const defaultOptions: FetcherOptions<any> = {
+const defaultFetcherOptions: FetcherOptions<any> = {
     cache: createMemoryCache(),
     cacheMode: CacheMode.Default,
     cacheMaxAge: 3600,
     cacheMinFresh: 1,
 };
 
+const defaultRequestOptions: RequestOptions<any> = {
+    retryTimes: 3,
+    retryBackoff: BackoffMode.Constant,
+    retryInitialWaitTime: 1,
+};
+
 export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
-    private options = Object.assign({}, defaultOptions);
+    private options = Object.assign({}, defaultFetcherOptions);
     private requestFactory: RequestFactory<T, R>;
     constructor(requestCreator: RequestCreator<T, R>, options: FetcherOptions<T>) {
         this.config(options);
@@ -46,7 +51,7 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
     }
 
     fetch(request?: R, options?: RequestOptions<T>) {
-        const mergedOptions = Object.assign({}, this.options, options);
+        const mergedOptions = Object.assign({}, defaultRequestOptions, this.options, options);
 
         const fetcherRequest = this.requestFactory.getRequest(mergedOptions, request);
 

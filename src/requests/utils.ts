@@ -10,15 +10,18 @@ export interface RequestControl<T, R> {
     release(cacheKey): void;
 }
 
+export const AbortErrorName = 'AbortError';
+
 export function createAbortError(): RequestResponse<any> {
     const error = new Error('Aborted');
-    error.name = 'AbortError';
+    error.name = AbortErrorName;
     return { error };
 }
 
+export type PromiseResolve<T> = (data?: T) => void;
 export interface PromiseWithControls<T> {
     promise: Promise<T>;
-    resolve: (data?: T) => void;
+    resolve: PromiseResolve<T>;
     reject: (err?: Error) => void;
 }
 
@@ -33,5 +36,29 @@ export function createPromise<T>(): PromiseWithControls<T> {
         promise,
         resolve,
         reject,
+    };
+}
+
+export function proxyResponseWithAdditionalNext<T>(
+    response: RequestResponse<T>,
+    onEnd: (res: RequestResponse<T>) => Promise<RequestResponse<T>> | undefined,
+): RequestResponse<T> {
+    const { next } = response;
+    let proxiedNext: Promise<RequestResponse<T>>;
+    if (!next) {
+        // reach end
+        proxiedNext = onEnd(response);
+    } else {
+        // continues the proxy to next
+        const promiseControls = createPromise<RequestResponse<T>>();
+        proxiedNext = promiseControls.promise;
+        next.then(res => {
+            promiseControls.resolve(proxyResponseWithAdditionalNext(res, onEnd));
+        });
+    }
+
+    return {
+        ...response,
+        next: proxiedNext,
     };
 }

@@ -2,6 +2,8 @@ import hash from 'object-hash';
 import { FetcherOptions, RequestOptions, RequestCreator } from '../types';
 import { FetcherRequest, RequestControl } from './utils';
 import { SWRFetcherRequest } from './swr';
+import { ROEFetcherRequest } from './roe';
+import { PollingFetcherRequest } from './polling';
 
 export class RequestFactory<T, R> {
     private requestControl: RequestControl<T, R>;
@@ -13,14 +15,15 @@ export class RequestFactory<T, R> {
     getRequest(options: FetcherOptions<T> & RequestOptions<T>, request?: R): FetcherRequest<T> {
         const cacheKey = options?.cacheKey ?? hash(request ?? null);
 
-        const fetcherRequest = new SWRFetcherRequest(
-            this.requestControl,
-            cacheKey,
-            options,
-            request,
-        );
+        if (options.pollingInterval !== undefined) {
+            return new PollingFetcherRequest(this.requestControl, cacheKey, options, request);
+        }
 
-        return fetcherRequest;
+        if (options.retryOnError) {
+            return new ROEFetcherRequest(this.requestControl, cacheKey, options, request);
+        }
+
+        return new SWRFetcherRequest(this.requestControl, cacheKey, options, request);
     }
 }
 

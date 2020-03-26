@@ -4,8 +4,8 @@ import {
     FetcherRequest,
     createAbortError,
     RequestControl,
-    PromiseWithControls,
     createPromise,
+    PromiseResolve,
 } from './utils';
 
 /**
@@ -15,7 +15,8 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
     private cacheControl: CacheControl<T>;
     private isRequestSent = false;
     private isAborted = false;
-    private response: PromiseWithControls<RequestResponse<T>>;
+    private response: Promise<RequestResponse<T>>;
+    private responseResolve: PromiseResolve<RequestResponse<T>>;
 
     constructor(
         private requestControl: RequestControl<T, R>,
@@ -29,15 +30,17 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
     run(): Promise<RequestResponse<T>> {
         // return ongoing response
         if (this.response) {
-            return this.response.promise;
+            return this.response;
         }
 
-        this.response = createPromise();
+        const responseControls = createPromise();
+        this.response = responseControls.promise;
+        this.responseResolve = responseControls.resolve;
 
         this.cacheControl.get(this.cacheKey).then(data => {
             if (this.isAborted) {
                 // might not necessary, just to ensure promise always resolved
-                this.response.resolve(createAbortError());
+                responseControls.resolve(createAbortError());
                 return;
             }
 
@@ -48,7 +51,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
             switch (this.options.cacheMode) {
                 case CacheMode.OnlyIfCached:
                     // skip load from network for OnlyIfCached
-                    this.response.resolve(response);
+                    responseControls.resolve(response);
                     break;
                 case CacheMode.Default:
                 case CacheMode.NoStore:
@@ -57,19 +60,23 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
                 default:
                     // check if cache is fresh and send request if it's not
                     if (this.cacheControl.isFresh(this.cacheKey)) {
-                        this.response.resolve(response);
+                        responseControls.resolve(response);
                         break;
                     }
 
-                    let next: PromiseWithControls<RequestResponse<T>>;
+                    let nextResolve: (res: RequestResponse<T>) => void;
                     if (data !== undefined) {
-                        next = createPromise<RequestResponse<T>>();
-                        response.next = next.promise;
+                        const nextControls = createPromise<RequestResponse<T>>();
+                        response.next = nextControls.promise;
                         // resolve with cache
-                        this.response.resolve(response);
+                        responseControls.resolve(response);
+
+                        nextResolve = nextControls.resolve;
+                        // to let abort work on next promise
+                        this.responseResolve = nextResolve;
                     } else {
-                        // no cache
-                        next = this.response;
+                        // no cache, reuse outter response
+                        nextResolve = responseControls.resolve;
                     }
 
                     this.requestControl
@@ -78,23 +85,22 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
                             this.cacheControl.set(this.cacheKey, data);
                             if (this.isAborted) {
                                 // might not necessary, just to ensure promise always resolved
-                                next.resolve(createAbortError());
+                                nextResolve(createAbortError());
                                 return;
                             }
 
-                            next.resolve({ data });
+                            nextResolve({ data });
                         })
                         .catch(error => {
-                            next.resolve({ error });
+                            nextResolve({ error });
                         });
 
-                    this.response.resolve = next.resolve;
                     this.isRequestSent = true;
                     break;
             }
         });
 
-        return this.response.promise;
+        return this.response;
     }
 
     abort() {
@@ -102,8 +108,8 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
             return;
         }
         this.isAborted = true;
-        if (this.response) {
-            this.response.resolve(createAbortError());
+        if (this.responseResolve) {
+            this.responseResolve(createAbortError());
         }
 
         if (this.isRequestSent) {
