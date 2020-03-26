@@ -61,9 +61,16 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
                         break;
                     }
 
-                    const next = createPromise<RequestResponse<T>>();
-                    response.next = next.promise;
-                    this.response.resolve(response);
+                    let next: PromiseWithControls<RequestResponse<T>>;
+                    if (data !== undefined) {
+                        next = createPromise<RequestResponse<T>>();
+                        response.next = next.promise;
+                        // resolve with cache
+                        this.response.resolve(response);
+                    } else {
+                        // no cache
+                        next = this.response;
+                    }
 
                     this.requestControl
                         .getResponse(this.cacheKey, this.request)
