@@ -12,6 +12,7 @@
     "clean": "del-cli lib",
     "build": "npm run clean && npm run compile && rollup lib/index.js --file lib/bundle.js --format cjs",
     "compile": "tsc --outDir lib -d",
+    "start": "npm run compile -- --watch",
     "release": "npm test && npm run build && standard-version && git push --follow-tags origin master && npm publish",
     "test": "jest"
   },
