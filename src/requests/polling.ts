@@ -1,10 +1,16 @@
 import { RequestResponse, FetcherOptions, RequestOptions } from '../types';
-import { FetcherRequest, createAbortError, RequestControl } from './utils';
+import { FetcherRequest, createAbortError, RequestControl, PromiseResolve } from './utils';
 
 /**
  * Polling request, handles client polling
  */
 export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
+    private innerRequest: FetcherRequest<T>;
+    private isAborted = false;
+    private response: Promise<RequestResponse<T>>;
+    private responseResolve: PromiseResolve<RequestResponse<T>>;
+    private pollingTimeout: ReturnType<typeof setTimeout>;
+
     constructor(
         private requestControl: RequestControl<T, R>,
         private cacheKey: string,
@@ -13,10 +19,19 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
     ) {}
 
     run(): Promise<RequestResponse<T>> {
-        // TODO: polling is not supported yet
-        return Promise.resolve({
-            error: new Error('not implemented'),
-        });
+        if (this.response) {
+            return this.response;
+        }
+
+        // start polling
+
+        return this.response;
     }
-    abort(): void {}
+    abort(): void {
+        if (this.isAborted) {
+            return;
+        }
+
+        this.isAborted = true;
+    }
 }

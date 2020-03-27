@@ -31,16 +31,12 @@ class LocalStorageCache<T> implements Cache<T> {
     set(key: string, value: T): Promise<void> {
         const strValue = JSON.stringify(value);
         localStorage.setItem(this.prefixHelper.appendPrefix(key), strValue);
-        if (this.keys) {
-            this.keys.add(key);
-        }
+        this.keys?.add(key);
         return Promise.resolve();
     }
     remove(key: string): Promise<void> {
         localStorage.removeItem(this.prefixHelper.appendPrefix(key));
-        if (this.keys) {
-            this.keys.delete(key);
-        }
+        this.keys?.delete(key);
         return Promise.resolve();
     }
     getKeys(): Promise<string[]> {
@@ -58,9 +54,7 @@ class LocalStorageCache<T> implements Cache<T> {
     }
     clear(): Promise<void> {
         return this.getKeys().then(keys => {
-            if (this.keys) {
-                this.keys.clear();
-            }
+            this.keys?.clear();
             return Promise.all(keys.map(key => this.remove(key)));
         }) as Promise<void>;
     }

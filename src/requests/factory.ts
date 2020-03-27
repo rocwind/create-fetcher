@@ -74,9 +74,7 @@ class RequestControlImpl<T, R> implements RequestControl<T, R> {
         instance.refCount -= 1;
         if (instance.refCount === 0) {
             this.instanceByKey.delete(cacheKey);
-            if (instance.abortController) {
-                instance.abortController.abort();
-            }
+            instance.abortController?.abort();
         }
     }
 }

@@ -44,9 +44,9 @@ export function useSWR<T, R = void>(
             const isValidating = !!next;
             // loading: no data available and validating
             const isLoading = !data && !stateRef.current.data && isValidating;
-            if (next) {
-                next.then(handleResponse);
-            }
+
+            // continue to handle next response
+            next?.then(handleResponse);
 
             stateRef.current = Object.assign({}, stateRef.current, {
                 data: data ?? stateRef.current.data,

@@ -111,12 +111,8 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
         }
         this.isAborted = true;
 
-        if (this.responseResolve) {
-            this.responseResolve(createAbortError());
-        }
-        if (this.innerRequest) {
-            this.innerRequest.abort();
-        }
+        this.responseResolve?.(createAbortError());
+        this.innerRequest?.abort();
         this.retryControl.reset();
     }
 }

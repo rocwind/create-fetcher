@@ -108,13 +108,9 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
             return;
         }
         this.isAborted = true;
-        if (this.responseResolve) {
-            this.responseResolve(createAbortError());
-        }
 
-        if (this.isRequestSent) {
-            this.requestControl.release(this.cacheKey);
-        }
+        this.responseResolve?.(createAbortError());
+        this.requestControl?.release(this.cacheKey);
     }
 }
 

@@ -35,16 +35,12 @@ class AsyncStorageCache<T> implements Cache<T> {
     set(key: string, value: T): Promise<void> {
         const strValue = JSON.stringify(value);
         return AsyncStorage.setItem(this.prefixHelper.appendPrefix(key), strValue).then(() => {
-            if (this.keys) {
-                this.keys.add(key);
-            }
+            this.keys?.add(key);
         });
     }
     remove(key: string): Promise<void> {
         return AsyncStorage.removeItem(this.prefixHelper.appendPrefix(key)).then(() => {
-            if (this.keys) {
-                this.keys.delete(key);
-            }
+            this.keys?.delete(key);
         });
     }
     getKeys(): Promise<string[]> {
@@ -57,16 +53,13 @@ class AsyncStorageCache<T> implements Cache<T> {
             const matched = keys
                 .filter(key => this.prefixHelper.matchPrefix(key))
                 .map(key => this.prefixHelper.removePrefix(key));
-            this.keys = new Set();
-            matched.forEach(key => this.keys.add(key));
+            this.keys = new Set(matched);
             return matched;
         });
     }
     clear(): Promise<void> {
         return this.getKeys().then(keys => {
-            if (this.keys) {
-                this.keys.clear();
-            }
+            this.keys?.clear();
             return AsyncStorage.multiRemove(keys.map(key => this.prefixHelper.appendPrefix(key)));
         }) as Promise<void>;
     }
