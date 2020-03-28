@@ -1,6 +1,11 @@
 import hash from 'object-hash';
-import { FetcherOptions, RequestOptions, RequestCreator } from '../types';
-import { FetcherRequest, RequestControl } from './utils';
+import { RequestCreator, Logger } from '../types';
+import {
+    FetcherRequest,
+    RequestControl,
+    FetcherRequestOptions,
+    getFetcherRequestLogger,
+} from './utils';
 import { SWRFetcherRequest } from './swr';
 import { ROEFetcherRequest } from './roe';
 import { PollingFetcherRequest } from './polling';
@@ -8,22 +13,40 @@ import { PollingFetcherRequest } from './polling';
 export class RequestFactory<T, R> {
     private requestControl: RequestControl<T, R>;
 
-    constructor(requestCreator: RequestCreator<T, R>) {
+    constructor(requestCreator: RequestCreator<T, R>, private logger?: Logger) {
         this.requestControl = new RequestControlImpl(requestCreator);
     }
 
-    getRequest(options: FetcherOptions<T> & RequestOptions<T>, request?: R): FetcherRequest<T> {
+    getRequest(options: FetcherRequestOptions<T>, request?: R): FetcherRequest<T> {
         const cacheKey = options?.cacheKey ?? hash(request ?? null);
 
         if (typeof options.pollingWaitTime === 'number') {
-            return new PollingFetcherRequest(this.requestControl, cacheKey, options, request);
+            return new PollingFetcherRequest(
+                this.requestControl,
+                cacheKey,
+                options,
+                request,
+                getFetcherRequestLogger('polling', options, cacheKey, this.logger),
+            );
         }
 
         if (options.retryOnError) {
-            return new ROEFetcherRequest(this.requestControl, cacheKey, options, request);
+            return new ROEFetcherRequest(
+                this.requestControl,
+                cacheKey,
+                options,
+                request,
+                getFetcherRequestLogger('swr', options, cacheKey, this.logger),
+            );
         }
 
-        return new SWRFetcherRequest(this.requestControl, cacheKey, options, request);
+        return new SWRFetcherRequest(
+            this.requestControl,
+            cacheKey,
+            options,
+            request,
+            getFetcherRequestLogger('swr', options, cacheKey, this.logger),
+        );
     }
 }
 

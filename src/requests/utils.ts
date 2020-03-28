@@ -1,4 +1,7 @@
-import { RequestResponse } from '../types';
+import { RequestResponse, FetcherOptions, RequestOptions, Logger } from '../types';
+import { keyDelimiter } from '../caches/utils';
+
+export type FetcherRequestOptions<T> = FetcherOptions<T> & RequestOptions<T>;
 
 export interface FetcherRequest<T> {
     run(): Promise<RequestResponse<T>>;
@@ -61,4 +64,17 @@ export function proxyResponseWithAdditionalNext<T>(
         ...response,
         next: proxiedNext,
     };
+}
+
+export function getFetcherRequestLogger(
+    name: string,
+    options: FetcherRequestOptions<any>,
+    cacheKey: string,
+    logger?: Logger,
+): Logger | undefined {
+    if (!logger) {
+        return;
+    }
+    const fullCacheKey = `${options.cacheKeyPrefix}${keyDelimiter}${cacheKey}`;
+    return (log: string) => logger(`${name}<${fullCacheKey}> ${log}`);
 }

@@ -10,7 +10,7 @@ class MemoryCache<T> implements Cache<T> {
      */
     constructor(private storage: Cache<T>) {}
 
-    get(key: string): Promise<T | null | undefined> {
+    get(key: string): Promise<T | undefined> {
         if (this.valueByKey.has(key)) {
             return Promise.resolve(this.valueByKey.get(key));
         }

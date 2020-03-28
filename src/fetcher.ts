@@ -6,6 +6,7 @@ import {
     RequestOptions,
     Cache,
     BackoffMode,
+    Logger,
 } from './types';
 import { createMemoryCache } from './caches/memory';
 import { KeyPrefixHelper } from './caches/utils';
@@ -29,7 +30,7 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
     private requestFactory: RequestFactory<T, R>;
     constructor(requestCreator: RequestCreator<T, R>, options: FetcherOptions<T>) {
         this.config(options);
-        this.requestFactory = new RequestFactory(requestCreator);
+        this.requestFactory = new RequestFactory(requestCreator, getLogger(options));
     }
 
     config(options) {
@@ -62,4 +63,16 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
             response: fetcherRequest.run(),
         };
     }
+}
+
+function getLogger(options: FetcherOptions<any>): Logger {
+    if (!options.logger) {
+        return undefined;
+    }
+
+    if (typeof options.logger === 'function') {
+        return options.logger;
+    }
+
+    return console.log;
 }

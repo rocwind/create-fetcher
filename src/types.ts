@@ -75,6 +75,8 @@ export interface CachedData<T> {
     timestamp: number;
 }
 
+export type Logger = (log: string) => void;
+
 /**
  * Options for fetcher
  */
@@ -99,6 +101,12 @@ export interface FetcherOptions<T> {
      * max amount of time of a cache is considered fresh, default to 3600s
      */
     cacheMaxAge?: number;
+    /**
+     * turn on debug logger or not
+     * - true: log to console
+     * - log method: use log method to log
+     */
+    logger?: boolean | Logger;
 }
 
 /**

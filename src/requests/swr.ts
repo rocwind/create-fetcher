@@ -1,4 +1,4 @@
-import { RequestResponse, CacheMode, FetcherOptions } from '../types';
+import { RequestResponse, CacheMode, Logger } from '../types';
 import { KeyPrefixHelper } from '../caches/utils';
 import {
     FetcherRequest,
@@ -6,6 +6,7 @@ import {
     RequestControl,
     createPromise,
     PromiseResolve,
+    FetcherRequestOptions,
 } from './utils';
 
 /**
@@ -21,8 +22,9 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
     constructor(
         private requestControl: RequestControl<T, R>,
         private cacheKey: string,
-        private options: FetcherOptions<T>,
+        private options: FetcherRequestOptions<T>,
         private request?: R,
+        private logger?: Logger,
     ) {
         this.cacheControl = new CacheControl(options);
     }
@@ -42,6 +44,9 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
                 // might not necessary, just to ensure promise always resolved
                 responseControls.resolve(createAbortError());
                 return;
+            }
+            if (data !== undefined) {
+                this.logger?.('valid cache found');
             }
 
             const response: RequestResponse<T> = {
@@ -63,6 +68,8 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
                         responseControls.resolve(response);
                         break;
                     }
+
+                    this.logger?.('start fetch from remote');
 
                     let nextResolve: (res: RequestResponse<T>) => void;
                     if (data !== undefined) {
@@ -89,9 +96,11 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
                                 return;
                             }
 
+                            this.logger?.('fetch from remote success');
                             nextResolve({ data });
                         })
                         .catch(error => {
+                            this.logger?.('fetch from remote failed');
                             nextResolve({ error });
                         });
 
@@ -108,9 +117,12 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
             return;
         }
         this.isAborted = true;
+        this.logger?.('aborted');
 
         this.responseResolve?.(createAbortError());
-        this.requestControl?.release(this.cacheKey);
+        if (this.isRequestSent) {
+            this.requestControl.release(this.cacheKey);
+        }
     }
 }
 
@@ -120,7 +132,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
 class CacheControl<T> {
     private prefixHelper: KeyPrefixHelper;
     private timestampByKey = new Map<string, number>();
-    constructor(private options: FetcherOptions<T>) {
+    constructor(private options: FetcherRequestOptions<T>) {
         this.prefixHelper = new KeyPrefixHelper(options.cacheKeyPrefix ?? '');
     }
 

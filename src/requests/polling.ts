@@ -1,4 +1,4 @@
-import { RequestResponse, FetcherOptions, RequestOptions, CacheMode } from '../types';
+import { RequestResponse, CacheMode, Logger } from '../types';
 import {
     FetcherRequest,
     createAbortError,
@@ -6,6 +6,7 @@ import {
     PromiseResolve,
     createPromise,
     proxyResponseWithAdditionalNext,
+    FetcherRequestOptions,
 } from './utils';
 import { ROEFetcherRequest } from './roe';
 import { SWRFetcherRequest } from './swr';
@@ -23,8 +24,9 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
     constructor(
         private requestControl: RequestControl<T, R>,
         private cacheKey: string,
-        private options: FetcherOptions<T> & RequestOptions<T>,
+        private options: FetcherRequestOptions<T>,
         private request?: R,
+        private logger?: Logger,
     ) {}
 
     run(): Promise<RequestResponse<T>> {
@@ -41,6 +43,7 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
             cacheMode: CacheMode.NoCache,
         });
         const pollingLoop = (): void => {
+            this.logger?.('start polling');
             clearTimeout(this.pollingTimeout);
 
             // first request may uses cache while followed requests doesn't need cache
@@ -48,8 +51,20 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
             isFirstRequest = false;
 
             this.innerRequest = this.options.retryOnError
-                ? new ROEFetcherRequest(this.requestControl, this.cacheKey, options, this.request)
-                : new SWRFetcherRequest(this.requestControl, this.cacheKey, options, this.request);
+                ? new ROEFetcherRequest(
+                      this.requestControl,
+                      this.cacheKey,
+                      options,
+                      this.request,
+                      this.logger,
+                  )
+                : new SWRFetcherRequest(
+                      this.requestControl,
+                      this.cacheKey,
+                      options,
+                      this.request,
+                      this.logger,
+                  );
 
             this.innerRequest.run().then(response => {
                 // this.responseResolve might be replaced inside the creating proxy response method
@@ -61,16 +76,19 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
                 }
 
                 const proxied = proxyResponseWithAdditionalNext(response, () => {
+                    this.logger?.('polling request settled');
                     if (this.isAborted) {
                         return;
                     }
 
                     const promiseControls = createPromise<RequestResponse<T>>();
                     this.responseResolve = promiseControls.resolve;
+
                     this.pollingTimeout = setTimeout(
                         pollingLoop,
                         this.options.pollingWaitTime * 1000,
                     );
+                    this.logger?.('next polling scheduled');
 
                     return promiseControls.promise;
                 });
@@ -86,8 +104,8 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
         if (this.isAborted) {
             return;
         }
-
         this.isAborted = true;
+        this.logger?.('aborted');
 
         this.innerRequest?.abort();
         this.responseResolve?.(createAbortError());

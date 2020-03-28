@@ -1,4 +1,4 @@
-import { RequestResponse, FetcherOptions, RequestOptions, BackoffMode, CacheMode } from '../types';
+import { RequestResponse, BackoffMode, CacheMode, Logger } from '../types';
 import {
     FetcherRequest,
     createAbortError,
@@ -7,6 +7,7 @@ import {
     proxyResponseWithAdditionalNext,
     AbortErrorName,
     PromiseResolve,
+    FetcherRequestOptions,
 } from './utils';
 import { SWRFetcherRequest } from './swr';
 
@@ -23,8 +24,9 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
     constructor(
         private requestControl: RequestControl<T, R>,
         private cacheKey: string,
-        private options: FetcherOptions<T> & RequestOptions<T>,
+        private options: FetcherRequestOptions<T>,
         private request?: R,
+        private logger?: Logger,
     ) {
         this.retryControl = new RetryControl(options);
     }
@@ -45,6 +47,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
             this.cacheKey,
             this.options,
             this.request,
+            this.logger,
         );
         this.innerRequest.run().then(response => {
             if (this.isAborted) {
@@ -68,6 +71,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
                 this.responseResolve = nextControls.resolve;
 
                 const retryLoop = () => {
+                    this.logger?.('start retry');
                     // do retry
                     this.innerRequest = new SWRFetcherRequest(
                         this.requestControl,
@@ -83,6 +87,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
                         }
                         if (error) {
                             if (!this.retryControl.canRetry()) {
+                                this.logger?.('run out retry times');
                                 // no retry times, resolve error
                                 nextControls.resolve({ error });
                                 return;
@@ -94,6 +99,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
                         nextControls.resolve({ data });
                     });
                 };
+                this.logger?.('retry scheduled');
                 this.retryControl.retry(retryLoop);
 
                 return nextControls.promise;
@@ -110,6 +116,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
             return;
         }
         this.isAborted = true;
+        this.logger?.('aborted');
 
         this.responseResolve?.(createAbortError());
         this.innerRequest?.abort();
@@ -121,7 +128,7 @@ class RetryControl<T> {
     private retriedTimes = 0;
     private nextRetryWaitTime = 0;
     private retryTimeout: ReturnType<typeof setTimeout>;
-    constructor(private options: RequestOptions<T>) {
+    constructor(private options: FetcherRequestOptions<T>) {
         this.reset();
     }
 
