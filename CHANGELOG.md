@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/rocwind/create-fetcher/compare/v0.0.3...v0.1.0) (2020-03-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* add BackoffMode.JitteredExponential and use it as default
+
+### Features
+
+* add BackoffMode.JitteredExponential and use it as default ([4646ba9](https://github.com/rocwind/create-fetcher/commit/4646ba921336cd6b09f7e30b2e7ff82f9e6191e7))
+* add logger option to fetcher ([214595a](https://github.com/rocwind/create-fetcher/commit/214595a6c42cb4fbf20b76496cf144e11c0af588))
+* implement the polling request ([8c1f0ab](https://github.com/rocwind/create-fetcher/commit/8c1f0ab42103630ef0ff2bc1422fe0f9c0e2b438))
+
 ### [0.0.3](https://github.com/rocwind/create-fetcher/compare/v0.0.2...v0.0.3) (2020-03-26)
 
 
