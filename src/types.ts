@@ -129,10 +129,10 @@ export type RequestOptions<T> = Omit<
      */
     retryInitialWaitTime?: number;
     /**
-     * polling interval
-     * TODO: not supported yet
+     * polling wait time, delay time from previous request fully settled to next polling request.
+     * set this option to turn on polling
      */
-    pollingInterval?: number;
+    pollingWaitTime?: number;
 };
 
 /**

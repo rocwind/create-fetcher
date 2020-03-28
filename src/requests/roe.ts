@@ -46,13 +46,13 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
             this.options,
             this.request,
         );
-        this.innerRequest.run().then(res => {
+        this.innerRequest.run().then(response => {
             if (this.isAborted) {
                 responseControls.resolve(createAbortError());
                 return;
             }
 
-            const proxied = proxyResponseWithAdditionalNext(res, ({ error }) => {
+            const proxied = proxyResponseWithAdditionalNext(response, ({ error }) => {
                 if (
                     this.isAborted ||
                     !error ||
