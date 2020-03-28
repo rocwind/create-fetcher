@@ -126,7 +126,6 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
 
 class RetryControl<T> {
     private retriedTimes = 0;
-    private nextRetryWaitTime = 0;
     private retryTimeout: ReturnType<typeof setTimeout>;
     constructor(private options: FetcherRequestOptions<T>) {
         this.reset();
@@ -135,7 +134,6 @@ class RetryControl<T> {
     reset(): void {
         clearTimeout(this.retryTimeout);
         this.retriedTimes = 0;
-        this.nextRetryWaitTime = this.options.retryInitialWaitTime;
     }
 
     canRetry(): boolean {
@@ -147,15 +145,32 @@ class RetryControl<T> {
             return;
         }
         clearTimeout(this.retryTimeout);
-        this.retryTimeout = setTimeout(callback, this.nextRetryWaitTime * 1000);
-        this.retriedTimes += 1;
+
+        let nextRetryWaitTime: number;
         switch (this.options.retryBackoff) {
+            case BackoffMode.JitteredExponential:
+                nextRetryWaitTime =
+                    this.options.retryInitialWaitTime * randomBetween(1, 2 ** this.retriedTimes);
+                break;
             case BackoffMode.Exponential:
-                this.nextRetryWaitTime *= 2;
+                nextRetryWaitTime = this.options.retryInitialWaitTime * 2 ** this.retriedTimes;
                 break;
             case BackoffMode.Constant:
             default:
+                nextRetryWaitTime = this.options.retryInitialWaitTime;
                 break;
         }
+        // cap retry wait time by max wait time
+        nextRetryWaitTime = Math.min(
+            nextRetryWaitTime,
+            this.options.retryMaxWaitTime ?? Number.MAX_VALUE,
+        );
+
+        this.retryTimeout = setTimeout(callback, nextRetryWaitTime * 1000);
+        this.retriedTimes += 1;
     }
+}
+
+function randomBetween(min: number, max: number): number {
+    return min + Math.random() * (max - min);
 }

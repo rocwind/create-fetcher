@@ -21,7 +21,7 @@ const defaultFetcherOptions: FetcherOptions<any> = {
 
 const defaultRequestOptions: RequestOptions<any> = {
     retryTimes: 3,
-    retryBackoff: BackoffMode.Constant,
+    retryBackoff: BackoffMode.JitteredExponential,
     retryInitialWaitTime: 1,
 };
 

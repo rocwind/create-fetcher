@@ -58,13 +58,17 @@ export enum CacheMode {
 
 export enum BackoffMode {
     /**
-     * constant backoff, use the same wait time constantly
+     * jittered exponential backoff
      */
-    Constant = 0,
+    JitteredExponential = 0,
     /**
-     * exponential backoff, increase wait time for each retry
+     * constant(None) backoff, use the same wait time constantly
      */
-    Exponential = 1,
+    Constant = 1,
+    /**
+     * exponential backoff, increase wait time by 2x for each retry
+     */
+    Exponential = 2,
 }
 
 export interface CachedData<T> {
@@ -129,13 +133,17 @@ export type RequestOptions<T> = Omit<
      */
     retryTimes?: number;
     /**
-     * backoff algorithm for retry wait interval, default is BackoffMode.Constant
+     * backoff algorithm for retry wait interval, default is BackoffMode.JitteredExponential
      */
     retryBackoff?: BackoffMode;
     /**
      * initial wait time for retry in seconds, default is 1s
      */
     retryInitialWaitTime?: number;
+    /**
+     * max wait time for retry(exponential backoff) in seconds, default is no max limit
+     */
+    retryMaxWaitTime?: number;
     /**
      * polling wait time, delay time from previous request fully settled to next polling request.
      * set this option to turn on polling
