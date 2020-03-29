@@ -18,7 +18,6 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
     private retryControl: RetryControl<T>;
     private innerRequest: FetcherRequest<T>;
     private isAborted = false;
-    private response: Promise<RequestResponse<T>>;
     private responseResolve: PromiseResolve<RequestResponse<T>>;
 
     constructor(
@@ -32,12 +31,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
     }
 
     run(): Promise<RequestResponse<T>> {
-        if (this.response) {
-            return this.response;
-        }
-
         const responseControls = createPromise<RequestResponse<T>>();
-        this.response = responseControls.promise;
         // for abort call to resolve abort error
         this.responseResolve = responseControls.resolve;
 
@@ -108,7 +102,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
             );
         });
 
-        return this.response;
+        return responseControls.promise;
     }
 
     abort(): void {

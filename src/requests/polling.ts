@@ -17,7 +17,6 @@ import { SWRFetcherRequest } from './swr';
 export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
     private innerRequest: FetcherRequest<T>;
     private isAborted = false;
-    private response: Promise<RequestResponse<T>>;
     private responseResolve: PromiseResolve<RequestResponse<T>>;
     private pollingTimeout: ReturnType<typeof setTimeout>;
 
@@ -30,12 +29,7 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
     ) {}
 
     run(): Promise<RequestResponse<T>> {
-        if (this.response) {
-            return this.response;
-        }
-
         const responseControls = createPromise<RequestResponse<T>>();
-        this.response = responseControls.promise;
         this.responseResolve = responseControls.resolve;
 
         let isFirstRequest = true;
@@ -98,7 +92,7 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
         };
         // start polling
         pollingLoop();
-        return this.response;
+        return responseControls.promise;
     }
 
     abort(): void {

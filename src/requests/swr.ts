@@ -16,7 +16,6 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
     private cacheControl: CacheControl<T>;
     private isRequestSent = false;
     private isAborted = false;
-    private response: Promise<RequestResponse<T>>;
     private responseResolve: PromiseResolve<RequestResponse<T>>;
 
     constructor(
@@ -30,13 +29,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
     }
 
     run(): Promise<RequestResponse<T>> {
-        // return ongoing response
-        if (this.response) {
-            return this.response;
-        }
-
         const responseControls = createPromise();
-        this.response = responseControls.promise;
         this.responseResolve = responseControls.resolve;
 
         this.cacheControl.get(this.cacheKey).then(data => {
@@ -111,7 +104,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
             }
         });
 
-        return this.response;
+        return responseControls.promise;
     }
 
     abort() {

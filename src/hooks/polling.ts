@@ -23,6 +23,13 @@ interface PollingState<T> {
     stop: () => void;
 }
 
+/**
+ *
+ * @param fetcher
+ * @param pollingWaitTime
+ * @param request need useMemo
+ * @param options need useMemo
+ */
 export function usePolling<T, R = void>(
     fetcher: Fetcher<T, R>,
     pollingWaitTime: number,
@@ -82,7 +89,7 @@ export function usePolling<T, R = void>(
             isPolling: true,
         };
         rerender({});
-    }, [rerender, fetcher, request, options, pollingWaitTime]);
+    }, [rerender, fetcher, pollingWaitTime, request, options]);
     stateRef.current.start = start;
 
     // auto start

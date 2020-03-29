@@ -20,6 +20,12 @@ const defaultState: SWRState<any> = {
     isFreshOrValidated: false,
 };
 
+/**
+ *
+ * @param fetcher
+ * @param request need useMemo
+ * @param options need useMemo
+ */
 export function useSWR<T, R = void>(
     fetcher: Fetcher<T, R>,
     request?: R,
