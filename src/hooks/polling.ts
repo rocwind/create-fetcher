@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Fetcher, RequestOptions, RequestResponse } from '../types';
+import { Fetcher, RequestOptions } from '../types';
 import { forEachResponse } from '../utils';
+import { useDeepEqualMemo } from './utils';
 
 export type PollingOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
     /**
@@ -36,6 +37,9 @@ export function usePolling<T, R = void>(
     request?: R,
     options?: PollingOptions<T>,
 ): PollingState<T> {
+    const requestMemo = useDeepEqualMemo(request);
+    const optionsMemo = useDeepEqualMemo(options);
+
     // use ref to keep current state
     const stateRef = useRef<PollingState<T>>({
         isPolling: false,
@@ -66,8 +70,8 @@ export function usePolling<T, R = void>(
         }
 
         const { abort, response } = fetcher.fetch(
-            request,
-            Object.assign({}, options, {
+            requestMemo,
+            Object.assign({}, optionsMemo, {
                 pollingWaitTime,
             }),
         );
@@ -89,11 +93,11 @@ export function usePolling<T, R = void>(
             isPolling: true,
         };
         rerender({});
-    }, [rerender, fetcher, pollingWaitTime, request, options]);
+    }, [rerender, fetcher, pollingWaitTime, requestMemo, optionsMemo]);
     stateRef.current.start = start;
 
     // auto start
-    const { manualStart } = options ?? {};
+    const { manualStart } = optionsMemo ?? {};
     useEffect(() => {
         if (!manualStart) {
             start();

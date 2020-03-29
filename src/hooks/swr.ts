@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Fetcher, RequestOptions } from '../types';
 import { forEachResponse } from '../utils';
+import { useDeepEqualMemo } from './utils';
 
 export type SWROptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'>;
 interface SWRState<T> {
@@ -31,6 +32,9 @@ export function useSWR<T, R = void>(
     request?: R,
     options?: SWROptions<T>,
 ): SWRState<T> {
+    const requestMemo = useDeepEqualMemo(request);
+    const optionsMemo = useDeepEqualMemo(options);
+
     // use ref to keep current state
     const stateRef = useRef<SWRState<T>>(defaultState);
 
@@ -45,7 +49,7 @@ export function useSWR<T, R = void>(
         }
 
         // - fetch and handle the update
-        const { abort, response } = fetcher.fetch(request, options);
+        const { abort, response } = fetcher.fetch(requestMemo, optionsMemo);
         response.then(
             forEachResponse(({ data, error, next }) => {
                 // isFreshOrValidated: no next request
@@ -72,7 +76,7 @@ export function useSWR<T, R = void>(
                 abort();
             }
         };
-    }, [fetcher, request, options]);
+    }, [fetcher, requestMemo, optionsMemo]);
 
     return stateRef.current;
 }

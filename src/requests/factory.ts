@@ -18,7 +18,7 @@ export class RequestFactory<T, R> {
     }
 
     getRequest(options: FetcherRequestOptions<T>, request?: R): FetcherRequest<T> {
-        const cacheKey = options?.cacheKey ?? hash(request ?? null);
+        const cacheKey = options?.cacheKey ?? hash.MD5(request ?? null);
 
         if (typeof options.pollingWaitTime === 'number') {
             return new PollingFetcherRequest(
