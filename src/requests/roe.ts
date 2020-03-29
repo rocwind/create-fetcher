@@ -36,7 +36,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
             return this.response;
         }
 
-        const responseControls = createPromise();
+        const responseControls = createPromise<RequestResponse<T>>();
         this.response = responseControls.promise;
         // for abort call to resolve abort error
         this.responseResolve = responseControls.resolve;
@@ -55,57 +55,57 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
                 return;
             }
 
-            const proxied = proxyResponseWithAdditionalNext(response, ({ error }) => {
-                if (
-                    this.isAborted ||
-                    !error ||
-                    error.name === AbortErrorName ||
-                    !this.retryControl.canRetry()
-                ) {
-                    return;
-                }
+            responseControls.resolve(
+                proxyResponseWithAdditionalNext(response, ({ error }) => {
+                    if (
+                        this.isAborted ||
+                        !error ||
+                        error.name === AbortErrorName ||
+                        !this.retryControl.canRetry()
+                    ) {
+                        return;
+                    }
 
-                // start retry
-                const nextControls = createPromise<RequestResponse<T>>();
-                // to let abort work on next promise
-                this.responseResolve = nextControls.resolve;
+                    // start retry
+                    const nextControls = createPromise<RequestResponse<T>>();
+                    // to let abort work on next promise
+                    this.responseResolve = nextControls.resolve;
 
-                const retryLoop = () => {
-                    this.logger?.('start retry');
-                    // do retry
-                    this.innerRequest = new SWRFetcherRequest(
-                        this.requestControl,
-                        this.cacheKey,
-                        // no cache for these requests - but saves result to cache
-                        Object.assign({}, this.options, { cacheMode: CacheMode.NoCache }),
-                        this.request,
-                    );
-                    this.innerRequest.run().then(({ data, error }) => {
-                        if (this.isAborted || error?.name === AbortErrorName) {
-                            nextControls.resolve(createAbortError());
-                            return;
-                        }
-                        if (error) {
-                            if (!this.retryControl.canRetry()) {
-                                this.logger?.('run out retry times');
-                                // no retry times, resolve error
-                                nextControls.resolve({ error });
+                    const retryLoop = () => {
+                        this.logger?.('start retry');
+                        // do retry
+                        this.innerRequest = new SWRFetcherRequest(
+                            this.requestControl,
+                            this.cacheKey,
+                            // no cache for these requests - but saves result to cache
+                            Object.assign({}, this.options, { cacheMode: CacheMode.NoCache }),
+                            this.request,
+                        );
+                        this.innerRequest.run().then(({ data, error }) => {
+                            if (this.isAborted || error?.name === AbortErrorName) {
+                                nextControls.resolve(createAbortError());
                                 return;
                             }
-                            this.retryControl.retry(retryLoop);
-                            return;
-                        }
+                            if (error) {
+                                if (!this.retryControl.canRetry()) {
+                                    this.logger?.('run out retry times');
+                                    // no retry times, resolve error
+                                    nextControls.resolve({ error });
+                                    return;
+                                }
+                                this.retryControl.retry(retryLoop);
+                                return;
+                            }
 
-                        nextControls.resolve({ data });
-                    });
-                };
-                this.logger?.('retry scheduled');
-                this.retryControl.retry(retryLoop);
+                            nextControls.resolve({ data });
+                        });
+                    };
+                    this.logger?.('retry scheduled');
+                    this.retryControl.retry(retryLoop);
 
-                return nextControls.promise;
-            });
-
-            responseControls.resolve(proxied);
+                    return nextControls.promise;
+                }),
+            );
         });
 
         return this.response;

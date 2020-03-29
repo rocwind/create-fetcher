@@ -2,6 +2,7 @@ import { RequestCreator, FetcherOptions, Fetcher } from './types';
 import { FetcherImpl } from './fetcher';
 
 export * from './types';
+export * from './utils';
 
 /**
  *

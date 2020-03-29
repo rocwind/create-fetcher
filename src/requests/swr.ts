@@ -89,6 +89,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
                     this.requestControl
                         .getResponse(this.cacheKey, this.request)
                         .then(data => {
+                            this.isRequestSent = false;
                             this.cacheControl.set(this.cacheKey, data);
                             if (this.isAborted) {
                                 // might not necessary, just to ensure promise always resolved
@@ -100,6 +101,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
                             nextResolve({ data });
                         })
                         .catch(error => {
+                            this.isRequestSent = false;
                             this.logger?.('fetch from remote failed');
                             nextResolve({ error });
                         });

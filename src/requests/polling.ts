@@ -75,24 +75,25 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
                     return;
                 }
 
-                const proxied = proxyResponseWithAdditionalNext(response, () => {
-                    this.logger?.('polling request settled');
-                    if (this.isAborted) {
-                        return;
-                    }
+                resolve(
+                    proxyResponseWithAdditionalNext(response, () => {
+                        this.logger?.('polling request settled');
+                        if (this.isAborted) {
+                            return;
+                        }
 
-                    const promiseControls = createPromise<RequestResponse<T>>();
-                    this.responseResolve = promiseControls.resolve;
+                        const promiseControls = createPromise<RequestResponse<T>>();
+                        this.responseResolve = promiseControls.resolve;
 
-                    this.pollingTimeout = setTimeout(
-                        pollingLoop,
-                        this.options.pollingWaitTime * 1000,
-                    );
-                    this.logger?.('next polling scheduled');
+                        this.pollingTimeout = setTimeout(
+                            pollingLoop,
+                            this.options.pollingWaitTime * 1000,
+                        );
+                        this.logger?.('next polling scheduled');
 
-                    return promiseControls.promise;
-                });
-                resolve(proxied);
+                        return promiseControls.promise;
+                    }),
+                );
             });
         };
         // start polling

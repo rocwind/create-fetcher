@@ -1,22 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
-import { Fetcher, RequestOptions, RequestResponse } from '../types';
+import { Fetcher, RequestOptions } from '../types';
+import { forEachResponse } from '../utils';
 
-export type SWROptions<T> = Omit<RequestOptions<T>, 'pollingInterval'>;
+export type SWROptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'>;
 interface SWRState<T> {
     data?: T;
     error?: Error;
     /**
-     * is loading initial data
+     * is initial data loaded, it may come from cache
      */
-    isLoading: boolean;
+    isLoaded: boolean;
     /**
-     * is validating data by network request
+     * is data fresh or validated by sending request
      */
-    isValidating: boolean;
+    isFreshOrValidated: boolean;
 }
 const defaultState: SWRState<any> = {
-    isLoading: true,
-    isValidating: true,
+    isLoaded: false,
+    isFreshOrValidated: false,
 };
 
 export function useSWR<T, R = void>(
@@ -39,30 +40,29 @@ export function useSWR<T, R = void>(
 
         // - fetch and handle the update
         const { abort, response } = fetcher.fetch(request, options);
-        const handleResponse = ({ data, error, next }: RequestResponse<T>) => {
-            // validating: has next request
-            const isValidating = !!next;
-            // loading: no data available and validating
-            const isLoading = !data && !stateRef.current.data && isValidating;
+        response.then(
+            forEachResponse(({ data, error, next }) => {
+                // isFreshOrValidated: no next request
+                const isFreshOrValidated = !next;
+                // current state
+                const currentData = data ?? stateRef.current.data;
+                // loaded: any data available or validated
+                const isLoaded = currentData !== undefined || isFreshOrValidated;
 
-            // continue to handle next response
-            next?.then(handleResponse);
+                stateRef.current = Object.assign({}, stateRef.current, {
+                    data: data ?? stateRef.current.data,
+                    error,
+                    isLoaded,
+                    isFreshOrValidated,
+                } as SWRState<T>);
 
-            stateRef.current = Object.assign({}, stateRef.current, {
-                data: data ?? stateRef.current.data,
-                error,
-                isLoading,
-                isValidating,
-            });
-
-            rerender({});
-        };
-
-        response.then(handleResponse);
+                rerender({});
+            }),
+        );
 
         return () => {
             // abort fetch if there is any pending request
-            if (stateRef.current.isValidating) {
+            if (!stateRef.current.isFreshOrValidated) {
                 abort();
             }
         };
