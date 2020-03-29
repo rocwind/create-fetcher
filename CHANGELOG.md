@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1](https://github.com/rocwind/create-fetcher/compare/v0.1.0...v0.1.1) (2020-03-29)
+
+
+### Features
+
+* add usePolling hook ([306f9a0](https://github.com/rocwind/create-fetcher/commit/306f9a0e4d74955a4613f9cf5a827d5de826409f))
+
+
+### Bug Fixes
+
+* add deep memo for request, options for hooks and use md5 hash for default cache key ([8d026d8](https://github.com/rocwind/create-fetcher/commit/8d026d87b6228d8833a3db3feeaf2fa8c6d1130b))
+
 ## [0.1.0](https://github.com/rocwind/create-fetcher/compare/v0.0.3...v0.1.0) (2020-03-28)
 
 
