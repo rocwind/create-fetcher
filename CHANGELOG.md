@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/rocwind/create-fetcher/compare/v0.1.1...v0.2.0) (2020-04-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename option `logger` to `log`
+
+### Bug Fixes
+
+* do not send remote request to revalidate cache for ForceCache ([d7f3891](https://github.com/rocwind/create-fetcher/commit/d7f389179f29a6d1900248ec6bc213cd94ee2dc3))
+
+
+* rename option `logger` to `log` ([3b9fac6](https://github.com/rocwind/create-fetcher/commit/3b9fac630bbae70c1ec7143177d4dd39e777847c))
+
 ### [0.1.1](https://github.com/rocwind/create-fetcher/compare/v0.1.0...v0.1.1) (2020-03-29)
 
 
