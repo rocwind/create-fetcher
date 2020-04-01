@@ -46,62 +46,52 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
                 data,
             };
 
-            switch (this.options.cacheMode) {
-                case CacheMode.OnlyIfCached:
-                    // skip load from network for OnlyIfCached
-                    responseControls.resolve(response);
-                    break;
-                case CacheMode.Default:
-                case CacheMode.NoStore:
-                case CacheMode.NoCache:
-                case CacheMode.ForceCache:
-                default:
-                    // check if cache is fresh and send request if it's not
-                    if (this.cacheControl.isFresh(this.cacheKey)) {
-                        responseControls.resolve(response);
-                        break;
-                    }
-
-                    this.logger?.('start fetch from remote');
-
-                    let nextResolve: (res: RequestResponse<T>) => void;
-                    if (data !== undefined) {
-                        const nextControls = createPromise<RequestResponse<T>>();
-                        response.next = nextControls.promise;
-                        // resolve with cache
-                        responseControls.resolve(response);
-
-                        nextResolve = nextControls.resolve;
-                        // to let abort work on next promise
-                        this.responseResolve = nextResolve;
-                    } else {
-                        // no cache, reuse outter response
-                        nextResolve = responseControls.resolve;
-                    }
-
-                    this.requestControl
-                        .getResponse(this.cacheKey, this.request)
-                        .then(data => {
-                            this.isRequestSent = false;
-                            this.cacheControl.set(this.cacheKey, data);
-                            if (this.isAborted) {
-                                // might not necessary, just to ensure promise always resolved
-                                nextResolve(createAbortError());
-                                return;
-                            }
-
-                            this.logger?.('fetch from remote success');
-                            nextResolve({ data });
-                        })
-                        .catch(error => {
-                            this.isRequestSent = false;
-                            this.logger?.('fetch from remote failed');
-                            nextResolve({ error });
-                        });
-
-                    this.isRequestSent = true;
-                    break;
+            // check if cache is fresh and send request if it's not
+            if (this.cacheControl.isFresh(this.cacheKey)) {
+                // resolve with response no matter it has cache loaded or not,
+                // since there is no follow-up steps
+                responseControls.resolve(response);
+                return;
             }
+
+            this.logger?.('start fetch from remote');
+
+            let nextResolve: (res: RequestResponse<T>) => void;
+            if (data !== undefined) {
+                const nextControls = createPromise<RequestResponse<T>>();
+                response.next = nextControls.promise;
+                // resolve with cache
+                responseControls.resolve(response);
+
+                nextResolve = nextControls.resolve;
+                // to let abort work on next promise
+                this.responseResolve = nextResolve;
+            } else {
+                // no cache, reuse outter response
+                nextResolve = responseControls.resolve;
+            }
+
+            this.requestControl
+                .getResponse(this.cacheKey, this.request)
+                .then(data => {
+                    this.isRequestSent = false;
+                    this.cacheControl.set(this.cacheKey, data);
+                    if (this.isAborted) {
+                        // might not necessary, just to ensure promise always resolved
+                        nextResolve(createAbortError());
+                        return;
+                    }
+
+                    this.logger?.('fetch from remote success');
+                    nextResolve({ data });
+                })
+                .catch(error => {
+                    this.isRequestSent = false;
+                    this.logger?.('fetch from remote failed');
+                    nextResolve({ error });
+                });
+
+            this.isRequestSent = true;
         });
 
         return responseControls.promise;
@@ -132,9 +122,18 @@ class CacheControl<T> {
     }
 
     isFresh(key: string): boolean {
+        // treat cache as fresh for OnlyIfCached - no matter there is a cache or not
+        // so it won't fetch from remote
+        if (this.options.cacheMode === CacheMode.OnlyIfCached) {
+            return true;
+        }
         const timestamp = this.timestampByKey.get(key);
         if (!timestamp) {
             return false;
+        }
+        // cache is always fresh for force cache if there is any cache
+        if (this.options.cacheMode === CacheMode.ForceCache) {
+            return true;
         }
         return Date.now() - timestamp < this.options.cacheMinFresh * 1000;
     }
