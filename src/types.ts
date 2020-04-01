@@ -106,11 +106,11 @@ export interface FetcherOptions<T> {
      */
     cacheMaxAge?: number;
     /**
-     * turn on debug logger or not
+     * turn on debug log or not
      * - true: log to console
      * - log method: use log method to log
      */
-    logger?: boolean | Logger;
+    log?: boolean | Logger;
 }
 
 /**

@@ -66,12 +66,12 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
 }
 
 function getLogger(options: FetcherOptions<any>): Logger {
-    if (!options.logger) {
+    if (!options.log) {
         return undefined;
     }
 
-    if (typeof options.logger === 'function') {
-        return options.logger;
+    if (typeof options.log === 'function') {
+        return options.log;
     }
 
     return console.log;
