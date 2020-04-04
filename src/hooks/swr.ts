@@ -76,7 +76,7 @@ export function useSWR<T, R = void>(
                 abort();
             }
         };
-    }, [fetcher, requestMemo, optionsMemo]);
+    }, [fetcher, requestMemo, optionsMemo, rerender]);
 
     return stateRef.current;
 }
