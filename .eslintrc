@@ -1,0 +1,13 @@
+{
+    "root": true,
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint", "react-hooks"],
+    "rules": {
+        // react-hooks
+        "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
+        "react-hooks/exhaustive-deps": "warn" // Checks effect dependencies
+    }
+}
