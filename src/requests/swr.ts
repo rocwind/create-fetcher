@@ -32,7 +32,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
         const responseControls = createPromise();
         this.responseResolve = responseControls.resolve;
 
-        this.cacheControl.get(this.cacheKey).then(data => {
+        this.cacheControl.get(this.cacheKey).then((data) => {
             if (this.isAborted) {
                 // might not necessary, just to ensure promise always resolved
                 responseControls.resolve(createAbortError());
@@ -73,7 +73,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
 
             this.requestControl
                 .getResponse(this.cacheKey, this.request)
-                .then(data => {
+                .then((data) => {
                     this.isRequestSent = false;
                     this.cacheControl.set(this.cacheKey, data);
                     if (this.isAborted) {
@@ -85,7 +85,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
                     this.logger?.('fetch from remote success');
                     nextResolve({ data });
                 })
-                .catch(error => {
+                .catch((error) => {
                     this.isRequestSent = false;
                     this.logger?.('fetch from remote failed');
                     nextResolve({ error });
@@ -147,7 +147,7 @@ class CacheControl<T> {
                 break;
         }
 
-        return this.options.cache.get(this.prefixHelper.appendPrefix(key)).then(cachedData => {
+        return this.options.cache.get(this.prefixHelper.appendPrefix(key)).then((cachedData) => {
             if (cachedData === undefined) {
                 return undefined;
             }

@@ -43,7 +43,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
             this.request,
             this.logger,
         );
-        this.innerRequest.run().then(response => {
+        this.innerRequest.run().then((response) => {
             if (this.isAborted) {
                 responseControls.resolve(createAbortError());
                 return;

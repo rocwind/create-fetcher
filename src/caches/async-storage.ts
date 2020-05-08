@@ -17,7 +17,7 @@ class AsyncStorageCache<T> implements Cache<T> {
             return Promise.resolve(undefined);
         }
 
-        return AsyncStorage.getItem(this.prefixHelper.appendPrefix(key)).then(strValue => {
+        return AsyncStorage.getItem(this.prefixHelper.appendPrefix(key)).then((strValue) => {
             if (!strValue) {
                 return Promise.resolve(undefined);
             }
@@ -49,18 +49,18 @@ class AsyncStorageCache<T> implements Cache<T> {
         }
 
         // search from storage if there is no local cache
-        return AsyncStorage.getAllKeys().then(keys => {
+        return AsyncStorage.getAllKeys().then((keys) => {
             const matched = keys
-                .filter(key => this.prefixHelper.matchPrefix(key))
-                .map(key => this.prefixHelper.removePrefix(key));
+                .filter((key) => this.prefixHelper.matchPrefix(key))
+                .map((key) => this.prefixHelper.removePrefix(key));
             this.keys = new Set(matched);
             return matched;
         });
     }
     clear(): Promise<void> {
-        return this.getKeys().then(keys => {
+        return this.getKeys().then((keys) => {
             this.keys?.clear();
-            return AsyncStorage.multiRemove(keys.map(key => this.prefixHelper.appendPrefix(key)));
+            return AsyncStorage.multiRemove(keys.map((key) => this.prefixHelper.appendPrefix(key)));
         }) as Promise<void>;
     }
 }

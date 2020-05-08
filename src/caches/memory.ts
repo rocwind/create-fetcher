@@ -14,7 +14,7 @@ class MemoryCache<T> implements Cache<T> {
         if (this.valueByKey.has(key)) {
             return Promise.resolve(this.valueByKey.get(key));
         }
-        return this.storage.get(key).then(value => {
+        return this.storage.get(key).then((value) => {
             // mem cache version is always newer and should be used
             if (this.valueByKey.has(key)) {
                 return this.valueByKey.get(key);

@@ -60,7 +60,7 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
                       this.logger,
                   );
 
-            this.innerRequest.run().then(response => {
+            this.innerRequest.run().then((response) => {
                 // this.responseResolve might be replaced inside the creating proxy response method
                 const resolve = this.responseResolve;
 

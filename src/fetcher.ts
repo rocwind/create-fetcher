@@ -42,11 +42,11 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
         const prefixHelper = new KeyPrefixHelper(this.options.cacheKeyPrefix);
         return cacheToClear
             .getKeys()
-            .then(keys =>
+            .then((keys) =>
                 Promise.all(
                     keys
-                        .filter(key => prefixHelper.matchPrefix(key))
-                        .map(key => cacheToClear.remove(key)),
+                        .filter((key) => prefixHelper.matchPrefix(key))
+                        .map((key) => cacheToClear.remove(key)),
                 ),
             ) as Promise<void>;
     }

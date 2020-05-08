@@ -53,9 +53,9 @@ class LocalStorageCache<T> implements Cache<T> {
         return Promise.resolve(Array.from(this.keys));
     }
     clear(): Promise<void> {
-        return this.getKeys().then(keys => {
+        return this.getKeys().then((keys) => {
             this.keys?.clear();
-            return Promise.all(keys.map(key => this.remove(key)));
+            return Promise.all(keys.map((key) => this.remove(key)));
         }) as Promise<void>;
     }
 }

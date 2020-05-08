@@ -55,7 +55,7 @@ export function proxyResponseWithAdditionalNext<T>(
         // continues the proxy to next
         const promiseControls = createPromise<RequestResponse<T>>();
         proxiedNext = promiseControls.promise;
-        next.then(res => {
+        next.then((res) => {
             promiseControls.resolve(proxyResponseWithAdditionalNext(res, onEnd));
         });
     }
