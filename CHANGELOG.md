@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/rocwind/create-fetcher/compare/v0.2.0...v0.2.1) (2020-05-08)
+
+
+### Features
+
+* add util function fallbackToPureFetch() ([cf3d1e2](https://github.com/rocwind/create-fetcher/commit/cf3d1e2296ce9cb438059c617b92f14811cdb6a3))
+
 ## [0.2.0](https://github.com/rocwind/create-fetcher/compare/v0.1.1...v0.2.0) (2020-04-01)
 
 
