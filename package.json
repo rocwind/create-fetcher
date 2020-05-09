@@ -2,15 +2,15 @@
   "name": "create-fetcher",
   "version": "0.2.1",
   "description": "customizable data fetcher wrapper for remote data fetching",
-  "main": "lib/bundle.js",
-  "module": "lib/index.js",
+  "type": "module",
+  "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib/"
   ],
   "scripts": {
     "clean": "del-cli lib",
-    "build": "npm run clean && npm run compile && rollup lib/index.js --file lib/bundle.js --format cjs",
+    "build": "npm run clean && npm run compile",
     "compile": "tsc --outDir lib -d",
     "start": "npm run compile -- --watch",
     "release": "npm test && npm run build && standard-version && git push --follow-tags origin master && npm publish",
@@ -39,7 +39,6 @@
     "del-cli": "3.0.0",
     "jest": "25.2.4",
     "react": "16.13.1",
-    "rollup": "2.3.2",
     "standard-version": "7.1.0",
     "ts-jest": "25.3.0",
     "typescript": "3.8.3"
