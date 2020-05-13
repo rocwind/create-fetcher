@@ -21,5 +21,12 @@ export type PureFetch<T, R = void> = (request?: R) => Promise<T>;
  */
 export function fallbackToPureFetch<T, R = void>(fetcher: Fetcher<T, R>): PureFetch<T, R> {
     return (request) =>
-        fetcher.fetch(request, { cacheMode: CacheMode.NoStore }).response.then((res) => res.data);
+        fetcher
+            .fetch(request, { cacheMode: CacheMode.NoStore })
+            .response.then(({ data, error }) => {
+                if (error) {
+                    throw error;
+                }
+                return data;
+            });
 }
