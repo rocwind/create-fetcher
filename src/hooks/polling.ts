@@ -5,7 +5,7 @@ import { useDeepEqualMemo } from './utils';
 
 export type PollingOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
     /**
-     * start the polling by manual call start() (don't auto start), default is false
+     * start the polling by manual call `start()` (don't auto start), default is false
      */
     manualStart?: boolean;
 };
@@ -13,6 +13,9 @@ export type PollingOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
 interface PollingState<T> {
     data?: T;
     error?: Error;
+    /**
+     * polling is started or not
+     */
     isPolling: boolean;
     /**
      * start polling
@@ -25,11 +28,11 @@ interface PollingState<T> {
 }
 
 /**
- *
- * @param fetcher
- * @param pollingWaitTime
- * @param request need useMemo
- * @param options need useMemo
+ * Send poling requests
+ * @param fetcher fetcher used for polling requests
+ * @param pollingWaitTime wait time between polling requests
+ * @param request request params
+ * @param options request options
  */
 export function usePolling<T, R = void>(
     fetcher: Fetcher<T, R>,
@@ -96,9 +99,9 @@ export function usePolling<T, R = void>(
     }, [rerender, fetcher, pollingWaitTime, requestMemo, optionsMemo]);
     stateRef.current.start = start;
 
-    // auto start
-    const { manualStart } = optionsMemo ?? {};
     useEffect(() => {
+        // auto start
+        const { manualStart } = optionsMemo ?? {};
         if (!manualStart) {
             start();
         }
@@ -106,7 +109,7 @@ export function usePolling<T, R = void>(
             // make sure polling stop if any params updated
             stop();
         };
-    }, [start, stop]);
+    }, [start, stop, optionsMemo]);
 
     return stateRef.current;
 }

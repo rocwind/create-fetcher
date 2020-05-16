@@ -1,9 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
-import { Fetcher, RequestOptions } from '../types';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
 import { useDeepEqualMemo } from './utils';
 
-export type SWROptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'>;
+export type SWROptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
+    /**
+     * start the fetch request by manual call `refresh()` (don't auto start), default is false
+     */
+    manualStart?: boolean;
+};
 interface SWRState<T> {
     data?: T;
     error?: Error;
@@ -15,17 +20,24 @@ interface SWRState<T> {
      * is data fresh or validated by sending request
      */
     isFreshOrValidated: boolean;
+    /**
+     * refresh data by trigger another swr request process
+     * @param cacheMode optional override cacheMode for this refresh fetch
+     */
+    refresh: (cacheMode?: CacheMode) => void;
 }
+
 const defaultState: SWRState<any> = {
     isLoaded: false,
     isFreshOrValidated: false,
+    refresh: () => {},
 };
 
 /**
- *
- * @param fetcher
- * @param request need useMemo
- * @param options need useMemo
+ * Send request and return data in SWR way
+ * @param fetcher fetcher used
+ * @param request request params
+ * @param options
  */
 export function useSWR<T, R = void>(
     fetcher: Fetcher<T, R>,
@@ -40,43 +52,77 @@ export function useSWR<T, R = void>(
 
     const rerender = useState(null)[1];
 
+    const abortRef = useRef<() => void>();
+
+    const refresh = useCallback(
+        (cacheMode?: CacheMode) => {
+            const mergedOptions = Object.assign({}, optionsMemo);
+            if (cacheMode) {
+                mergedOptions.cacheMode = cacheMode;
+            }
+
+            // reset state to not fully loaded
+            stateRef.current = Object.assign({}, stateRef.current, {
+                isFreshOrValidated: false,
+                error: undefined,
+                isLoaded: stateRef.current.data !== undefined,
+            });
+            rerender({});
+
+            // abort previous request if there is any
+            abortRef.current?.();
+
+            // send fetch request
+            const { abort, response } = fetcher.fetch(requestMemo, mergedOptions);
+            abortRef.current = abort;
+            response.then(
+                forEachResponse(({ data, error, next }) => {
+                    // isFreshOrValidated: no next request
+                    const isFreshOrValidated = !next;
+                    // current state
+                    const currentData = data ?? stateRef.current.data;
+                    // loaded: any data available or validated
+                    const isLoaded = currentData !== undefined || isFreshOrValidated;
+
+                    stateRef.current = Object.assign({}, stateRef.current, {
+                        data: data ?? stateRef.current.data,
+                        error,
+                        isLoaded,
+                        isFreshOrValidated,
+                    } as SWRState<T>);
+
+                    rerender({});
+
+                    if (!next) {
+                        // clear abort if request fully settled
+                        abortRef.current = undefined;
+                    }
+                }),
+            );
+        },
+        [rerender, fetcher, requestMemo, optionsMemo],
+    );
+    stateRef.current.refresh = refresh;
+
     useEffect(() => {
         // send request
-        // - reset
+        // - reset state
         if (stateRef.current !== defaultState) {
             stateRef.current = defaultState;
             rerender({});
         }
 
-        // - fetch and handle the update
-        const { abort, response } = fetcher.fetch(requestMemo, optionsMemo);
-        response.then(
-            forEachResponse(({ data, error, next }) => {
-                // isFreshOrValidated: no next request
-                const isFreshOrValidated = !next;
-                // current state
-                const currentData = data ?? stateRef.current.data;
-                // loaded: any data available or validated
-                const isLoaded = currentData !== undefined || isFreshOrValidated;
-
-                stateRef.current = Object.assign({}, stateRef.current, {
-                    data: data ?? stateRef.current.data,
-                    error,
-                    isLoaded,
-                    isFreshOrValidated,
-                } as SWRState<T>);
-
-                rerender({});
-            }),
-        );
+        // auto start
+        const { manualStart } = optionsMemo ?? {};
+        if (!manualStart) {
+            refresh();
+        }
 
         return () => {
             // abort fetch if there is any pending request
-            if (!stateRef.current.isFreshOrValidated) {
-                abort();
-            }
+            abortRef.current?.();
         };
-    }, [fetcher, requestMemo, optionsMemo]);
+    }, [fetcher, refresh, optionsMemo]);
 
     return stateRef.current;
 }
