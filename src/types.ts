@@ -37,38 +37,38 @@ export enum CacheMode {
     /**
      * use local cache if it is not expired, and load from network if it is no longer fresh
      */
-    Default = 0,
+    Default = 1,
     /**
      * totally ignore cache, load from network and not store result to cache
      */
-    NoStore = 1,
+    NoStore = 2,
     /**
      * load from network no matter there is local cache or not and store result to cache
      */
-    NoCache = 2,
+    NoCache = 3,
     /**
      * use local cache if it exists, even it's expired, otherwise load from network and store result to cache
      */
-    ForceCache = 3,
+    ForceCache = 4,
     /**
      * use local cache result, event it's expired
      */
-    OnlyIfCached = 4,
+    OnlyIfCached = 5,
 }
 
 export enum BackoffMode {
     /**
      * jittered exponential backoff
      */
-    JitteredExponential = 0,
+    JitteredExponential = 1,
     /**
      * constant(None) backoff, use the same wait time constantly
      */
-    Constant = 1,
+    Constant = 2,
     /**
      * exponential backoff, increase wait time by 2x for each retry
      */
-    Exponential = 2,
+    Exponential = 3,
 }
 
 export interface CachedData<T> {
@@ -145,7 +145,7 @@ export type RequestOptions<T> = Omit<
      */
     retryMaxWaitTime?: number;
     /**
-     * polling wait time, delay time from previous request fully settled to next polling request.
+     * polling wait time in seconds, delay time from previous request fully settled to next polling request.
      * set this option to turn on polling
      */
     pollingWaitTime?: number;
@@ -188,8 +188,8 @@ export interface RequestReturn<T> {
  */
 export interface Fetcher<T, R = void> {
     /**
-     *
-     * @param request
+     * perform fetch
+     * @param request request params
      * @param options
      */
     fetch(request?: R, options?: RequestOptions<T>): RequestReturn<T>;
