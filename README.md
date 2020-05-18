@@ -14,7 +14,7 @@ import { createFetcher, forEachResponse } from 'create-fetcher';
 const userInfoFetcher = createFetcher((id, { signal }) => fetch(`/api/v1/users/${id}`, { signal }));
 
 userInfoFetcher.fetch(1).response.then(forEachResponse(({ data, error }) => {
-    if (data != null) {
+    if (data !== undefined) {
         // deal with received data, either from valid cache or remote server ...
         console.log(data);
     }

@@ -200,8 +200,10 @@ export interface Fetcher<T, R = void> {
     config(options: FetcherOptions<T>): void;
     /**
      * clear cached responses
+     * @param maxAge only keys older than maxAge will be cleared if set
+     * @param cache cache to be cleared, default is the cache set in fetcher options
      */
-    clearCache(): Promise<void>;
+    clearCache(maxAge?: number, cache?: Cache<CachedData<T>>): Promise<void>;
 }
 
 /**

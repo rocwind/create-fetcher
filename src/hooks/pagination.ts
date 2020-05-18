@@ -130,7 +130,7 @@ export function usePaginationList<L, T, R>(
 
             response.then(
                 forEachResponse(({ data, error, next }) => {
-                    if (data != null) {
+                    if (data !== undefined) {
                         const pageList = listExtractor(data);
                         const prevList = stateRef.current.list;
                         const list = isInitialPage ? pageList : prevList.concat(pageList);
