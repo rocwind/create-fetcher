@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.4](https://github.com/rocwind/create-fetcher/compare/v0.2.3...v0.2.4) (2020-05-18)
+
+
+### Features
+
+* add `refresh()` and `manualStart` to `useSWR()` return / options ([19848c1](https://github.com/rocwind/create-fetcher/commit/19848c12fb213bbe69bdaa3d68088ab7189155f3))
+* add clearCache() util function to prune cache by removing keys that older than given max age ([aa1e777](https://github.com/rocwind/create-fetcher/commit/aa1e77709407188cce41d56147b476ab8f957f13))
+* add react hooks: usePaginationList() ([fce868b](https://github.com/rocwind/create-fetcher/commit/fce868b729e22a5450e040ff4b664e27d399b1d6))
+
 ### [0.2.3](https://github.com/rocwind/create-fetcher/compare/v0.2.2...v0.2.3) (2020-05-13)
 
 
