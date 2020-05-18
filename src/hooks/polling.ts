@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { Fetcher, RequestOptions } from '../types';
 import { forEachResponse } from '../utils';
-import { useDeepEqualMemo } from './utils';
+import { useDeepEqualMemo, useRerender } from './utils';
 
 export type PollingOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
     /**
@@ -48,7 +48,7 @@ export function usePolling<T, R = void>(
         isPolling: false,
     } as PollingState<T>);
 
-    const rerender = useState(null)[1];
+    const rerender = useRerender();
 
     const abortRef = useRef<() => void>();
 
@@ -63,7 +63,7 @@ export function usePolling<T, R = void>(
             ...stateRef.current,
             isPolling: false,
         };
-        rerender({});
+        rerender();
     }, []);
     stateRef.current.stop = stop;
 
@@ -85,7 +85,7 @@ export function usePolling<T, R = void>(
                     data: data ?? stateRef.current.data,
                     error,
                 };
-                rerender({});
+                rerender();
             }),
         );
         abortRef.current = abort;
@@ -95,7 +95,7 @@ export function usePolling<T, R = void>(
             error: undefined,
             isPolling: true,
         };
-        rerender({});
+        rerender();
     }, [rerender, fetcher, pollingWaitTime, requestMemo, optionsMemo]);
     stateRef.current.start = start;
 

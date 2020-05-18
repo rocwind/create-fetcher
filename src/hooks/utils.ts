@@ -1,7 +1,7 @@
-import { useRef } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import hash from 'object-hash';
 
-function isDeepEqual<T>(value1: T, value2: T): boolean {
+export function isDeepEqual<T>(value1: T, value2: T): boolean {
     if (value1 === value2) {
         return true;
     }
@@ -18,4 +18,14 @@ export function useDeepEqualMemo<T>(value: T): T {
         ref.current = value;
     }
     return ref.current;
+}
+
+/**
+ * hack rerender trigger
+ */
+export function useRerender(): () => void {
+    const rerender = useState(null)[1];
+    return useCallback(() => {
+        rerender({});
+    }, [rerender]);
 }

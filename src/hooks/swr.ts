@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
-import { useDeepEqualMemo } from './utils';
+import { useDeepEqualMemo, useRerender } from './utils';
 
 export type SWROptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
     /**
@@ -27,12 +27,6 @@ interface SWRState<T> {
     refresh: (cacheMode?: CacheMode) => void;
 }
 
-const defaultState: SWRState<any> = {
-    isLoaded: false,
-    isFreshOrValidated: false,
-    refresh: () => {},
-};
-
 /**
  * Send request and return data in SWR way
  * @param fetcher fetcher used
@@ -48,9 +42,12 @@ export function useSWR<T, R = void>(
     const optionsMemo = useDeepEqualMemo(options);
 
     // use ref to keep current state
-    const stateRef = useRef<SWRState<T>>(defaultState);
+    const stateRef = useRef<SWRState<T>>({
+        isLoaded: false,
+        isFreshOrValidated: false,
+    } as SWRState<T>);
 
-    const rerender = useState(null)[1];
+    const rerender = useRerender();
 
     const abortRef = useRef<() => void>();
 
@@ -67,7 +64,7 @@ export function useSWR<T, R = void>(
                 error: undefined,
                 isLoaded: stateRef.current.data !== undefined,
             });
-            rerender({});
+            rerender();
 
             // abort previous request if there is any
             abortRef.current?.();
@@ -91,7 +88,7 @@ export function useSWR<T, R = void>(
                         isFreshOrValidated,
                     } as SWRState<T>);
 
-                    rerender({});
+                    rerender();
 
                     if (!next) {
                         // clear abort if request fully settled
@@ -106,10 +103,15 @@ export function useSWR<T, R = void>(
 
     useEffect(() => {
         // send request
-        // - reset state
-        if (stateRef.current !== defaultState) {
-            stateRef.current = defaultState;
-            rerender({});
+        // - reset state if it's previous loaded
+        if (stateRef.current.isLoaded || stateRef.current.error) {
+            stateRef.current = Object.assign({}, stateRef.current, {
+                data: undefined,
+                error: undefined,
+                isLoaded: false,
+                isFreshOrValidated: false,
+            });
+            rerender();
         }
 
         // auto start

@@ -195,9 +195,9 @@ export interface Fetcher<T, R = void> {
     fetch(request?: R, options?: RequestOptions<T>): RequestReturn<T>;
     /**
      * update fetcher options
-     * @param options
+     * @param options fetch options to set
      */
-    config(options: FetcherOptions<T>);
+    config(options: FetcherOptions<T>): void;
     /**
      * clear cached responses
      */
