@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.5](https://github.com/rocwind/create-fetcher/compare/v0.2.4...v0.2.5) (2020-05-18)
+
+
+### Bug Fixes
+
+* expose the response data in usePaginationList() returns ([1a38f88](https://github.com/rocwind/create-fetcher/commit/1a38f883b6495e5a36e4620b6e21097f35e827b7))
+
 ### [0.2.4](https://github.com/rocwind/create-fetcher/compare/v0.2.3...v0.2.4) (2020-05-18)
 
 
