@@ -10,15 +10,25 @@ export type PaginationListOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'
     manualStart?: boolean;
 };
 
-interface PaginationListState<L> {
+interface PaginationListState<L, T> {
+    /**
+     * the concat list
+     */
     list: L[];
+    /**
+     * latest response data
+     */
+    data?: T;
+    /**
+     * latest error
+     */
     error?: Error;
     /**
      *
      */
     isLoading: boolean;
     /**
-     *
+     * there is still more list items to load or not
      */
     hasMore: boolean;
     /**
@@ -28,9 +38,8 @@ interface PaginationListState<L> {
 
     /**
      * refresh list data
-     * @param cacheMode optional override cacheMode for this refresh
      */
-    refresh: (cacheMode?: CacheMode) => void;
+    refresh: () => void;
 }
 
 /**
@@ -56,16 +65,16 @@ export function usePaginationList<L, T, R>(
     nextRequestCreator: NextRequestCreator<T, R>,
     initialRequest?: R,
     options?: PaginationListOptions<T>,
-): PaginationListState<L> {
+): PaginationListState<L, T> {
     const initialRequestMemo = useDeepEqualMemo(initialRequest);
     const optionsMemo = useDeepEqualMemo(options);
 
     // use ref to keep current state
-    const stateRef = useRef<PaginationListState<L>>({
+    const stateRef = useRef<PaginationListState<L, T>>({
         list: [],
         isLoading: false,
         hasMore: true,
-    } as PaginationListState<L>);
+    } as PaginationListState<L, T>);
 
     const rerender = useRerender();
 
@@ -80,6 +89,7 @@ export function usePaginationList<L, T, R>(
             !stateRef.current.hasMore
         ) {
             stateRef.current = Object.assign({}, stateRef.current, {
+                data: undefined,
                 list: [],
                 error: undefined,
                 isLoading: false,
@@ -140,6 +150,10 @@ export function usePaginationList<L, T, R>(
                                 list,
                             });
                         }
+
+                        stateRef.current = Object.assign({}, stateRef.current, {
+                            data,
+                        });
                     }
 
                     if (!next) {
