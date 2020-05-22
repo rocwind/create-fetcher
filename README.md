@@ -1,4 +1,4 @@
-# create-fetcher
+# create-fetcher ![Node.js CI](https://github.com/rocwind/create-fetcher/workflows/Node.js%20CI/badge.svg)
 create-fetcher is a remote data fetching library, providing common features - configurable caching, retry, polling with both promised-based API and react hooks.
 
 ## Install
