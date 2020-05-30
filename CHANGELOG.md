@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.7](https://github.com/rocwind/create-fetcher/compare/v0.2.6...v0.2.7) (2020-05-30)
+
+
+### Bug Fixes
+
+* correct SWR wrapper hook name ([74b8eef](https://github.com/rocwind/create-fetcher/commit/74b8eefbba3c4633f9e76943cabeb6baad394d27))
+
 ### [0.2.6](https://github.com/rocwind/create-fetcher/compare/v0.2.5...v0.2.6) (2020-05-30)
 
 
