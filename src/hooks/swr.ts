@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
 import { useDeepEqualMemo, useRerender } from './utils';
@@ -127,4 +127,15 @@ export function useSWR<T, R = void>(
     }, [fetcher, refresh, optionsMemo]);
 
     return stateRef.current;
+}
+
+export function createSWRHook<T, R = void>(fetcher: Fetcher<T, R>) {
+    return function usePollingWrapper(initialRequest: R, options: SWROptions<T>) {
+        return useSWR(fetcher, initialRequest, options);
+    };
+}
+
+export function useSWRHookCreator<T, R = void>(fetcher: Fetcher<T, R>) {
+    const [result] = useState(() => createSWRHook(fetcher));
+    return result;
 }

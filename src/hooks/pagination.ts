@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
 import { useDeepEqualMemo, useRerender, isDeepEqual } from './utils';
@@ -211,4 +211,31 @@ export function usePaginationList<L, T, R>(
         };
     }, [loadMore, initialRequestMemo, optionsMemo]);
     return stateRef.current;
+}
+
+export function createPaginationListHook<L, T, R>(
+    fetcher: Fetcher<T, R>,
+    listExtractor: ListExtractor<T, L>,
+    nextRequestCreator: NextRequestCreator<T, R>,
+) {
+    return function usePaginationListWrapper(initialRequest: R, options: PaginationListOptions<T>) {
+        return usePaginationList(
+            fetcher,
+            listExtractor,
+            nextRequestCreator,
+            initialRequest,
+            options,
+        );
+    };
+}
+
+export function usePaginationListHookCreator<L, T, R>(
+    fetcher: Fetcher<T, R>,
+    listExtractor: ListExtractor<T, L>,
+    nextRequestCreator: NextRequestCreator<T, R>,
+) {
+    const [result] = useState(() => {
+        return createPaginationListHook(fetcher, listExtractor, nextRequestCreator);
+    });
+    return result;
 }

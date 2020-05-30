@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { Fetcher, RequestOptions } from '../types';
 import { forEachResponse } from '../utils';
 import { useDeepEqualMemo, useRerender } from './utils';
@@ -112,4 +112,18 @@ export function usePolling<T, R = void>(
     }, [start, stop, optionsMemo]);
 
     return stateRef.current;
+}
+
+export function createPollingHook<T, R = void>(fetcher: Fetcher<T, R>, pollingWaitTime: number) {
+    return function usePollingWrapper(initialRequest: R, options: PollingOptions<T>) {
+        return usePolling(fetcher, pollingWaitTime, initialRequest, options);
+    };
+}
+
+export function usePollingHookCreator<T, R = void>(
+    fetcher: Fetcher<T, R>,
+    pollingWaitTime: number,
+) {
+    const [result] = useState(() => createPollingHook(fetcher, pollingWaitTime));
+    return result;
 }

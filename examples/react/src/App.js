@@ -1,7 +1,11 @@
-/* eslint-disable */
 import React from 'react';
 import { createFetcher, CacheMode } from 'create-fetcher';
-import { useSWR, usePolling, usePaginationList } from 'create-fetcher/lib/hooks';
+import {
+    useSWR,
+    usePolling,
+    usePaginationListHookCreator,
+    useSWRHookCreator,
+} from 'create-fetcher/lib/hooks';
 import { createLocalStorageCache } from 'create-fetcher/lib/caches/localStorage';
 
 const waitFor = (delayed) =>
@@ -54,13 +58,6 @@ const listFetcher = createFetcher(
         cacheMaxAge: 10,
     },
 );
-const listExtractor = (result) => [result];
-const nextRequestCreator = (result, prevRequest) => {
-    if (prevRequest < 10) {
-        return prevRequest + 1;
-    }
-    return null;
-};
 
 function App() {
     /**
@@ -72,21 +69,31 @@ function App() {
     /**
      * only auto request when previous (swr) is ready and result is fresh
      */
-    const { data: swr2 } = useSWR(echoFetcher, swr, { manualStart: !isFreshOrValidated });
+    const { data: swr2 } = useSWRHookCreator(echoFetcher)(swr, {
+        manualStart: !isFreshOrValidated,
+    });
     /**
      * polling for data updates each 2 seconds
      */
     const { data: polling, isPolling, start, stop } = usePolling(timestampFetcher, 2);
 
     /**
-     *
+     * pagination list hook by use its creator
      */
-    const { list, isLoading, hasMore, loadMore, refresh: refreshList } = usePaginationList(
+    const usePaginationListHook = usePaginationListHookCreator(
         listFetcher,
-        listExtractor,
-        nextRequestCreator,
-        0,
+        (result) => [result],
+        (result, prevRequest) => {
+            if (prevRequest < 10) {
+                return prevRequest + 1;
+            }
+            return null;
+        },
     );
+    /**
+     * use the pagination list hook
+     */
+    const { list, isLoading, hasMore, loadMore, refresh: refreshList } = usePaginationListHook(0);
 
     return (
         <table>
