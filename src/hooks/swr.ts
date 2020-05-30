@@ -130,7 +130,7 @@ export function useSWR<T, R = void>(
 }
 
 export function createSWRHook<T, R = void>(fetcher: Fetcher<T, R>) {
-    return function usePollingWrapper(initialRequest: R, options: SWROptions<T>) {
+    return function useSWRWrapper(initialRequest: R, options: SWROptions<T>) {
         return useSWR(fetcher, initialRequest, options);
     };
 }
