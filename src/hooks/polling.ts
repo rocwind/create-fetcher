@@ -115,8 +115,8 @@ export function usePolling<T, R = void>(
 }
 
 export function createPollingHook<T, R = void>(fetcher: Fetcher<T, R>, pollingWaitTime: number) {
-    return function usePollingWrapper(initialRequest: R, options: PollingOptions<T>) {
-        return usePolling(fetcher, pollingWaitTime, initialRequest, options);
+    return function usePollingWrapper(request?: R, options?: PollingOptions<T>) {
+        return usePolling(fetcher, pollingWaitTime, request, options);
     };
 }
 

@@ -49,7 +49,7 @@ export type ListExtractor<T, L> = (data: T) => L[];
 /**
  * create next request by previous request and data, return null if it reaches end
  */
-export type NextRequestCreator<T, R> = (prevData: T, prevRequest: R) => R;
+export type NextRequestCreator<T, R> = (prevData: T, prevRequest?: R) => R;
 
 /**
  *
@@ -218,7 +218,10 @@ export function createPaginationListHook<L, T, R>(
     listExtractor: ListExtractor<T, L>,
     nextRequestCreator: NextRequestCreator<T, R>,
 ) {
-    return function usePaginationListWrapper(initialRequest: R, options: PaginationListOptions<T>) {
+    return function usePaginationListWrapper(
+        initialRequest?: R,
+        options?: PaginationListOptions<T>,
+    ) {
         return usePaginationList(
             fetcher,
             listExtractor,
