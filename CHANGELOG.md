@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.6](https://github.com/rocwind/create-fetcher/compare/v0.2.5...v0.2.6) (2020-05-30)
+
+
+### Features
+
+* add createXXXHook() and useXXXHookCreator() to hooks ([13cd1df](https://github.com/rocwind/create-fetcher/commit/13cd1dfa0e82ffc1bb0e808666094f6a1b9553fa))
+
 ### [0.2.5](https://github.com/rocwind/create-fetcher/compare/v0.2.4...v0.2.5) (2020-05-18)
 
 
