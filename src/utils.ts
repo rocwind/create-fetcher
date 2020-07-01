@@ -1,17 +1,19 @@
-import { RequestResponse, Fetcher, CacheMode, Cache, CachedData } from './types';
+import { RequestResponse, RequestReturn, Fetcher, CacheMode, Cache, CachedData } from './types';
 
 export type ResponseHandler<T> = (response: RequestResponse<T>) => void;
 /**
  * helper for handle each fetcher.fetch() response
- * @param handler
+ * @param requestReturn the fetcher.fetch() request return
+ * @param handler handle that deal with each response
+ * @returns abort function that can abort this request
  */
-export function forEachResponse<T>(handler: ResponseHandler<T>): ResponseHandler<T> {
+export function forEachResponse<T>(requestReturn: RequestReturn<T>, handler: ResponseHandler<T>): () => void {
     const forEachHandler: ResponseHandler<T> = (response) => {
         handler(response);
         response.next?.then(forEachHandler);
     };
-
-    return forEachHandler;
+    requestReturn.response.then(forEachHandler);
+    return requestReturn.abort;
 }
 
 export type PureFetch<T, R = void> = (request?: R) => Promise<T>;

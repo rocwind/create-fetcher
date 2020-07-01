@@ -72,23 +72,22 @@ export function usePolling<T, R = void>(
             return;
         }
 
-        const { abort, response } = fetcher.fetch(
-            requestMemo,
-            Object.assign({}, optionsMemo, {
-                pollingWaitTime,
-            }),
-        );
-        response.then(
-            forEachResponse(({ data, error }) => {
+        abortRef.current = forEachResponse(
+            fetcher.fetch(
+                requestMemo,
+                Object.assign({}, optionsMemo, {
+                    pollingWaitTime,
+                }),
+            ),
+            ({ data, error }) => {
                 stateRef.current = {
                     ...stateRef.current,
                     data: data ?? stateRef.current.data,
                     error,
                 };
                 rerender();
-            }),
+            },
         );
-        abortRef.current = abort;
 
         stateRef.current = {
             ...stateRef.current,

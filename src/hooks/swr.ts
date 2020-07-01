@@ -70,10 +70,9 @@ export function useSWR<T, R = void>(
             abortRef.current?.();
 
             // send fetch request
-            const { abort, response } = fetcher.fetch(requestMemo, mergedOptions);
-            abortRef.current = abort;
-            response.then(
-                forEachResponse(({ data, error, next }) => {
+            abortRef.current = forEachResponse(
+                fetcher.fetch(requestMemo, mergedOptions),
+                ({ data, error, next }) => {
                     // isFreshOrValidated: no next request
                     const isFreshOrValidated = !next;
                     // current state
@@ -94,7 +93,7 @@ export function useSWR<T, R = void>(
                         // clear abort if request fully settled
                         abortRef.current = undefined;
                     }
-                }),
+                },
             );
         },
         [rerender, fetcher, requestMemo, optionsMemo],

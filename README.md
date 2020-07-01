@@ -13,7 +13,7 @@ import { createFetcher, forEachResponse } from 'create-fetcher';
 
 const userInfoFetcher = createFetcher((id, { signal }) => fetch(`/api/v1/users/${id}`, { signal }));
 
-userInfoFetcher.fetch(1).response.then(forEachResponse(({ data, error }) => {
+forEachResponse(userInfoFetcher.fetch(1), ({ data, error }) => {
     if (data !== undefined) {
         // deal with received data, either from valid cache or remote server ...
         console.log(data);
@@ -23,7 +23,7 @@ userInfoFetcher.fetch(1).response.then(forEachResponse(({ data, error }) => {
         // deal with error ...
         console.warn(error);
     }
-}));
+});
 ```
 
 ### React Hooks

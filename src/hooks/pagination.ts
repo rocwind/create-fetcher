@@ -135,11 +135,9 @@ export function usePaginationList<L, T, R>(
                 });
             }
 
-            const { abort, response } = fetcher.fetch(nextRequestRef.current, mergedOptions);
-            abortRef.current = abort;
-
-            response.then(
-                forEachResponse(({ data, error, next }) => {
+            abortRef.current = forEachResponse(
+                fetcher.fetch(nextRequestRef.current, mergedOptions),
+                ({ data, error, next }) => {
                     if (data !== undefined) {
                         const pageList = listExtractor(data);
                         const prevList = stateRef.current.list;
@@ -182,7 +180,7 @@ export function usePaginationList<L, T, R>(
                     });
 
                     rerender();
-                }),
+                },
             );
         },
         [resetState, listExtractor, nextRequestCreator, initialRequestMemo, optionsMemo],
