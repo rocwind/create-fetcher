@@ -40,7 +40,7 @@
     "del-cli": "3.0.1",
     "jest": "26.1.0",
     "react": "16.13.1",
-    "standard-version": "8.0.0",
+    "standard-version": "8.0.1",
     "ts-jest": "26.1.1",
     "typescript": "3.9.6"
   },
