@@ -64,7 +64,7 @@ function App() {
      * basic swr use
      */
     const { data: swr, refresh, isFreshOrValidated } = useSWR(timestampFetcher, null, {
-        retryOnError: true,
+        retryTimes: 3,
     });
     /**
      * only auto request when previous (swr) is ready and result is fresh

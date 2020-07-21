@@ -125,11 +125,7 @@ export type RequestOptions<T> = Omit<
      */
     cacheKey?: string;
     /**
-     * turn on retry on error or not, default is false
-     */
-    retryOnError?: boolean;
-    /**
-     * max retry times, default is 3
+     * max retry times, default is 0 - do not retry on error, set to Infinity for unlimited retry times
      */
     retryTimes?: number;
     /**

@@ -30,7 +30,7 @@ export class RequestFactory<T, R> {
             );
         }
 
-        if (options.retryOnError) {
+        if (options.retryTimes > 0) {
             return new ROEFetcherRequest(
                 this.requestControl,
                 cacheKey,

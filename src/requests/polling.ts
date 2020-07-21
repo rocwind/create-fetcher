@@ -44,7 +44,7 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
             const options = isFirstRequest ? this.options : optionsWithNoCache;
             isFirstRequest = false;
 
-            this.innerRequest = this.options.retryOnError
+            this.innerRequest = this.options.retryTimes > 0
                 ? new ROEFetcherRequest(
                       this.requestControl,
                       this.cacheKey,
