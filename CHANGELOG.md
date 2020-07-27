@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/rocwind/create-fetcher/compare/v0.2.8...v0.3.0) (2020-07-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove cache key prefix delimiter `:`
+* remove `retryOnError` option, use `retryTimes > 0` to turn on the retry
+* forEachResponse() takes 2 params now - fetch() return and handler - and returns the abort() method
+
+* remove `retryOnError` option, use `retryTimes > 0` to turn on the retry ([ad2a633](https://github.com/rocwind/create-fetcher/commit/ad2a633fe0e7fe40069bdba4eedb48bc024682e7))
+* remove cache key prefix delimiter `:` ([273eef4](https://github.com/rocwind/create-fetcher/commit/273eef4f2c868a388c0efc84df1d7252bfc763c7))
+* update the forEachResponse() util function ([e14c76c](https://github.com/rocwind/create-fetcher/commit/e14c76c13ef6bc07d9a5668e0d237bcbd7e2127c))
+
 ### [0.2.8](https://github.com/rocwind/create-fetcher/compare/v0.2.7...v0.2.8) (2020-05-30)
 
 
