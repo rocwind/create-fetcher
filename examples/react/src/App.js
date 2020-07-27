@@ -14,7 +14,7 @@ const waitFor = (delayed) =>
     });
 
 // cache to local storage
-const cache = createLocalStorageCache('@fetcher');
+const cache = createLocalStorageCache();
 
 // resolves with current timestamp
 const timestampFetcher = createFetcher(
@@ -25,7 +25,7 @@ const timestampFetcher = createFetcher(
     },
     {
         cache,
-        cacheKeyPrefix: 'timestamp',
+        cacheKeyPrefix: 'timestamp:',
         cacheMode: CacheMode.Default,
         cacheMaxAge: 10,
         cacheMinFresh: 3,
@@ -40,7 +40,7 @@ const echoFetcher = createFetcher(
     },
     {
         cache,
-        cacheKeyPrefix: 'echo',
+        cacheKeyPrefix: 'echo:',
         cacheMode: CacheMode.NoStore,
     },
 );
@@ -53,7 +53,7 @@ const listFetcher = createFetcher(
     },
     {
         cache,
-        cacheKeyPrefix: 'list',
+        cacheKeyPrefix: 'list:',
         cacheMinFresh: 3,
         cacheMaxAge: 10,
     },

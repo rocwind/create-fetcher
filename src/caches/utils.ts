@@ -1,8 +1,7 @@
-export const keyDelimiter = ':';
 export class KeyPrefixHelper {
     private prefix: string;
     constructor(prefix: string) {
-        this.prefix = `${prefix}${keyDelimiter}`;
+        this.prefix = prefix;
     }
 
     matchPrefix(key: string) {
@@ -18,4 +17,4 @@ export class KeyPrefixHelper {
     }
 }
 
-export const defaultPrefix = '@fetcher';
+export const defaultPrefix = '@fetcher:';

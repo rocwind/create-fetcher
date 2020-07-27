@@ -1,5 +1,4 @@
 import { RequestResponse, FetcherOptions, RequestOptions, Logger } from '../types';
-import { keyDelimiter } from '../caches/utils';
 
 export type FetcherRequestOptions<T> = FetcherOptions<T> & RequestOptions<T>;
 
@@ -75,6 +74,6 @@ export function getFetcherRequestLogger(
     if (!logger) {
         return;
     }
-    const fullCacheKey = `${options.cacheKeyPrefix}${keyDelimiter}${cacheKey}`;
+    const fullCacheKey = `${options.cacheKeyPrefix}${cacheKey}`;
     return (log: string) => logger(`${name}<${fullCacheKey}> ${log}`);
 }
