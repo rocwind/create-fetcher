@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1](https://github.com/rocwind/create-fetcher/compare/v0.3.0...v0.3.1) (2020-09-19)
+
+
+### Bug Fixes
+
+* export state types for hooks ([0382da3](https://github.com/rocwind/create-fetcher/commit/0382da345fb7380b80bbd9596e573b02fcb74d0d))
+
 ## [0.3.0](https://github.com/rocwind/create-fetcher/compare/v0.2.8...v0.3.0) (2020-07-27)
 
 
