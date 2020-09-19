@@ -10,7 +10,7 @@ export type PaginationListOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'
     manualStart?: boolean;
 };
 
-interface PaginationListState<L, T> {
+export interface PaginationListState<L, T> {
     /**
      * the concat list
      */

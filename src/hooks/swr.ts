@@ -9,7 +9,7 @@ export type SWROptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
      */
     manualStart?: boolean;
 };
-interface SWRState<T> {
+export interface SWRState<T> {
     data?: T;
     error?: Error;
     /**

@@ -10,7 +10,7 @@ export type PollingOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
     manualStart?: boolean;
 };
 
-interface PollingState<T> {
+export interface PollingState<T> {
     data?: T;
     error?: Error;
     /**
