@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.2](https://github.com/rocwind/create-fetcher/compare/v0.3.1...v0.3.2) (2020-09-24)
+
+
+### Bug Fixes
+
+* **types:** support `cacheKeyPrefix`, `cacheMinFresh`, `cacheMaxAge` in `RequestOptions` ([104dcc3](https://github.com/rocwind/create-fetcher/commit/104dcc34612e06f9af60cf06b2f6fbddb2f6ac56))
+
 ### [0.3.1](https://github.com/rocwind/create-fetcher/compare/v0.3.0...v0.3.1) (2020-09-19)
 
 
