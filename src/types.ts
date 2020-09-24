@@ -116,10 +116,7 @@ export interface FetcherOptions<T> {
 /**
  * Options for one time fetcher request, it overrides fetch options if there is any conflicts
  */
-export type RequestOptions<T> = Omit<
-    FetcherOptions<T>,
-    'cacheKeyPrefix' | 'cacheMinFresh' | 'cacheMaxAge'
-> & {
+export type RequestOptions<T> = FetcherOptions<T> & {
     /**
      * override default cache key
      */
