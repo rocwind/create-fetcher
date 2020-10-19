@@ -118,7 +118,7 @@ class CacheControl<T> {
     private prefixHelper: KeyPrefixHelper;
     private timestampByKey = new Map<string, number>();
     constructor(private options: FetcherRequestOptions<T>) {
-        this.prefixHelper = new KeyPrefixHelper(options.cacheKeyPrefix ?? '');
+        this.prefixHelper = new KeyPrefixHelper(options.cacheKeyPrefix);
     }
 
     isFresh(key: string): boolean {

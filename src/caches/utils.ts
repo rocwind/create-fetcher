@@ -1,7 +1,7 @@
 export class KeyPrefixHelper {
     private prefix: string;
-    constructor(prefix: string) {
-        this.prefix = prefix;
+    constructor(prefix?: string) {
+        this.prefix = prefix ?? '';
     }
 
     matchPrefix(key: string) {

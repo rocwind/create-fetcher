@@ -1,3 +1,4 @@
+import { createPromise } from './requests/utils';
 import { RequestResponse, RequestReturn, Fetcher, CacheMode, Cache, CachedData } from './types';
 
 export type ResponseHandler<T> = (response: RequestResponse<T>) => void;
@@ -7,13 +8,43 @@ export type ResponseHandler<T> = (response: RequestResponse<T>) => void;
  * @param handler handle that deal with each response
  * @returns abort function that can abort this request
  */
-export function forEachResponse<T>(requestReturn: RequestReturn<T>, handler: ResponseHandler<T>): () => void {
+export function forEachResponse<T>(
+    requestReturn: RequestReturn<T>,
+    handler: ResponseHandler<T>,
+): () => void {
     const forEachHandler: ResponseHandler<T> = (response) => {
         handler(response);
         response.next?.then(forEachHandler);
     };
     requestReturn.response.then(forEachHandler);
     return requestReturn.abort;
+}
+
+/**
+ * helper for handle each fetcher.fetch() response
+ * and returns the latest data it receives after all responses settled
+ * @param requestReturn
+ */
+export function getFinalResponse<T>(requestReturn: RequestReturn<T>): Promise<T> {
+    const { promise, resolve, reject } = createPromise<T>();
+    let latestData: T;
+    let lastError: Error;
+    forEachResponse(requestReturn, ({ data, error, next }) => {
+        if (data !== undefined) {
+            latestData = data;
+        }
+        if (error) {
+            lastError = error;
+        }
+        if (!next) {
+            if (latestData !== undefined) {
+                resolve(latestData);
+            } else {
+                reject(lastError);
+            }
+        }
+    });
+    return promise;
 }
 
 export type PureFetch<T, R = void> = (request?: R) => Promise<T>;

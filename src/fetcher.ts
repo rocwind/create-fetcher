@@ -14,7 +14,6 @@ import { KeyPrefixHelper } from './caches/utils';
 import { RequestFactory } from './requests/factory';
 
 const defaultFetcherOptions: FetcherOptions<any> = {
-    cache: createMemoryCache(),
     cacheMode: CacheMode.Default,
     cacheMaxAge: 3600,
     cacheMinFresh: 1,
@@ -27,8 +26,9 @@ const defaultRequestOptions: RequestOptions<any> = {
 };
 
 export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
-    private options = Object.assign({}, defaultFetcherOptions);
+    private options = Object.assign({}, defaultFetcherOptions, { cache: createMemoryCache() });
     private requestFactory: RequestFactory<T, R>;
+    private ongoingClearCache = Promise.resolve();
     constructor(requestCreator: RequestCreator<T, R>, options: FetcherOptions<T>) {
         this.config(options);
         this.requestFactory = new RequestFactory(requestCreator, getLogger(options));
@@ -41,24 +41,35 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
     clearCache(maxAge?: number, cache?: Cache<CachedData<T>>) {
         const cacheToClear = cache ?? this.options.cache;
         const prefixHelper = new KeyPrefixHelper(this.options.cacheKeyPrefix);
-        return cacheToClear.getKeys().then((keys) =>
-            Promise.all(
-                keys
-                    .filter((key) => prefixHelper.matchPrefix(key))
-                    .map((key) => {
-                        if (maxAge > 0) {
-                            return cacheToClear.get(key).then((data) => {
-                                // cache is valid
-                                if (data?.timestamp + maxAge * 1000 > Date.now()) {
-                                    return;
-                                }
-                                return cacheToClear.remove(key);
-                            });
-                        }
-                        return cacheToClear.remove(key);
-                    }),
-            ),
-        ) as Promise<void>;
+        // serialize the calls to clearCache() and have fetch wait for the clearCache finish
+        const thisClearCache = this.ongoingClearCache
+            .then(() => cacheToClear.getKeys())
+            .then((keys) => {
+                return Promise.all(
+                    keys
+                        .filter((key) => prefixHelper.matchPrefix(key))
+                        .map((key) => {
+                            if (maxAge > 0) {
+                                return cacheToClear.get(key).then((data) => {
+                                    // cache is valid
+                                    if (data?.timestamp + maxAge * 1000 > Date.now()) {
+                                        return;
+                                    }
+                                    return cacheToClear.remove(key);
+                                });
+                            }
+                            return cacheToClear.remove(key);
+                        }),
+                );
+            })
+            .then(() => {
+                if (this.ongoingClearCache === thisClearCache) {
+                    this.ongoingClearCache = Promise.resolve();
+                }
+            });
+        this.ongoingClearCache = thisClearCache;
+
+        return thisClearCache;
     }
 
     fetch(request?: R, options?: RequestOptions<T>) {
@@ -70,7 +81,9 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
             abort: () => {
                 fetcherRequest.abort();
             },
-            response: fetcherRequest.run(),
+            response: this.ongoingClearCache.then(() => {
+                return fetcherRequest.run();
+            }),
         };
     }
 }
