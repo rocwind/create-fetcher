@@ -23,24 +23,24 @@ export function forEachResponse<T>(
 /**
  * helper for handle each fetcher.fetch() response
  * and returns the latest data it receives after all responses settled
- * @param requestReturn
+ * NOTE:
+ *  - it only reject with error if there is no any data available
+ *  - this method SHOULD NOT be used together with polling requests - which never ends
+ * @param requestReturn the fetcher.fetch() request return
  */
 export function getFinalResponse<T>(requestReturn: RequestReturn<T>): Promise<T> {
     const { promise, resolve, reject } = createPromise<T>();
     let latestData: T;
-    let lastError: Error;
     forEachResponse(requestReturn, ({ data, error, next }) => {
         if (data !== undefined) {
             latestData = data;
         }
-        if (error) {
-            lastError = error;
-        }
+
         if (!next) {
-            if (latestData !== undefined) {
+            if (latestData !== undefined || !error) {
                 resolve(latestData);
             } else {
-                reject(lastError);
+                reject(error);
             }
         }
     });

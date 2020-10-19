@@ -21,7 +21,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
     constructor(
         private requestControl: RequestControl<T, R>,
         private cacheKey: string,
-        private options: FetcherRequestOptions<T>,
+        options: FetcherRequestOptions<T>,
         private request?: R,
         private logger?: Logger,
     ) {
