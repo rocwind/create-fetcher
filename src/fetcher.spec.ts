@@ -16,14 +16,14 @@ describe('FetcherImpl', () => {
         mockFetch.mockClear();
     });
 
-    xit('returns data that get from fetch', async () => {
+    it('returns data that get from fetch', async () => {
         const fetcher = new FetcherImpl(mockFetch, {});
         const { data } = await fetcher.fetch(1).response;
         expect(mockFetch).toBeCalledTimes(1);
         expect(data).toEqual(1);
     });
 
-    xit('returns data that get from cache for 2nd call', async () => {
+    it('returns data that get from cache for 2nd call', async () => {
         const fetcher = new FetcherImpl(mockFetch, {});
         await fetcher.fetch(1).response;
         const { data } = await fetcher.fetch(1).response;
