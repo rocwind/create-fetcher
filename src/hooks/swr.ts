@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
-import { useDeepEqualMemo, useRerender } from './utils';
+import { useDeepEqualMemo, useRenderState, useShallowEqualMemo } from './utils';
 
 export type SWROptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
     /**
@@ -39,7 +39,7 @@ export function useSWR<T, R = void>(
     options?: SWROptions<T>,
 ): SWRState<T> {
     const requestMemo = useDeepEqualMemo(request);
-    const optionsMemo = useDeepEqualMemo(options);
+    const optionsMemo = useShallowEqualMemo(options);
 
     // use ref to keep current state
     const stateRef = useRef<SWRState<T>>({
@@ -47,7 +47,10 @@ export function useSWR<T, R = void>(
         isFreshOrValidated: false,
     } as SWRState<T>);
 
-    const rerender = useRerender();
+    // delay 34 ms(2 frames at 60fps) to render new state
+    // this gives time for loading cached data and skip
+    // the component rerender if the state doesn't change
+    const renderState = useRenderState(stateRef, 34, 34);
 
     const abortRef = useRef<() => void>();
 
@@ -59,12 +62,13 @@ export function useSWR<T, R = void>(
             }
 
             // reset state to not fully loaded
-            stateRef.current = Object.assign({}, stateRef.current, {
-                isFreshOrValidated: false,
-                error: undefined,
-                isLoaded: stateRef.current.data !== undefined,
-            });
-            rerender();
+            renderState(
+                Object.assign({}, stateRef.current, {
+                    isFreshOrValidated: false,
+                    error: undefined,
+                    isLoaded: stateRef.current.data !== undefined,
+                }),
+            );
 
             // abort previous request if there is any
             abortRef.current?.();
@@ -77,17 +81,18 @@ export function useSWR<T, R = void>(
                     const isFreshOrValidated = !next;
                     // current state
                     const currentData = data ?? stateRef.current.data;
+
                     // loaded: any data available or validated
                     const isLoaded = currentData !== undefined || isFreshOrValidated;
 
-                    stateRef.current = Object.assign({}, stateRef.current, {
-                        data: data ?? stateRef.current.data,
-                        error,
-                        isLoaded,
-                        isFreshOrValidated,
-                    } as SWRState<T>);
-
-                    rerender();
+                    renderState(
+                        Object.assign({}, stateRef.current, {
+                            data: data ?? stateRef.current.data,
+                            error,
+                            isLoaded,
+                            isFreshOrValidated,
+                        } as SWRState<T>),
+                    );
 
                     if (!next) {
                         // clear abort if request fully settled
@@ -96,7 +101,7 @@ export function useSWR<T, R = void>(
                 },
             );
         },
-        [rerender, fetcher, requestMemo, optionsMemo],
+        [renderState, fetcher, requestMemo, optionsMemo],
     );
     stateRef.current.refresh = refresh;
 
@@ -104,13 +109,14 @@ export function useSWR<T, R = void>(
         // send request
         // - reset state if it's previous loaded
         if (stateRef.current.isLoaded || stateRef.current.error) {
-            stateRef.current = Object.assign({}, stateRef.current, {
-                data: undefined,
-                error: undefined,
-                isLoaded: false,
-                isFreshOrValidated: false,
-            });
-            rerender();
+            renderState(
+                Object.assign({}, stateRef.current, {
+                    data: undefined,
+                    error: undefined,
+                    isLoaded: false,
+                    isFreshOrValidated: false,
+                }),
+            );
         }
 
         // auto start
@@ -122,8 +128,10 @@ export function useSWR<T, R = void>(
         return () => {
             // abort fetch if there is any pending request
             abortRef.current?.();
+            // cancel previous pending state render
+            renderState.cancel();
         };
-    }, [fetcher, refresh, optionsMemo]);
+    }, [fetcher, refresh, renderState, optionsMemo]);
 
     return stateRef.current;
 }

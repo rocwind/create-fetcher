@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Fetcher, RequestOptions } from '../types';
 import { forEachResponse } from '../utils';
-import { useDeepEqualMemo, useRerender } from './utils';
+import { useDeepEqualMemo, useRerender, useShallowEqualMemo } from './utils';
 
 export type PollingOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
     /**
@@ -41,7 +41,7 @@ export function usePolling<T, R = void>(
     options?: PollingOptions<T>,
 ): PollingState<T> {
     const requestMemo = useDeepEqualMemo(request);
-    const optionsMemo = useDeepEqualMemo(options);
+    const optionsMemo = useShallowEqualMemo(options);
 
     // use ref to keep current state
     const stateRef = useRef<PollingState<T>>({

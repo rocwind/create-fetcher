@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
-import { useDeepEqualMemo, useRerender, isDeepEqual } from './utils';
+import { useDeepEqualMemo, useRerender, isDeepEqual, useShallowEqualMemo } from './utils';
 
 export type PaginationListOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
     /**
@@ -67,7 +67,7 @@ export function usePaginationList<L, T, R>(
     options?: PaginationListOptions<T>,
 ): PaginationListState<L, T> {
     const initialRequestMemo = useDeepEqualMemo(initialRequest);
-    const optionsMemo = useDeepEqualMemo(options);
+    const optionsMemo = useShallowEqualMemo(options);
 
     // use ref to keep current state
     const stateRef = useRef<PaginationListState<L, T>>({
@@ -142,7 +142,7 @@ export function usePaginationList<L, T, R>(
                         const pageList = listExtractor(data);
                         const prevList = stateRef.current.list;
                         const list = isInitialPage ? pageList : prevList.concat(pageList);
-                        // compare if changed before we update the list
+                        // compare if it changed before we update the list
                         if (list.length !== prevList.length || !isDeepEqual(list, prevList)) {
                             stateRef.current = Object.assign({}, stateRef.current, {
                                 list,
