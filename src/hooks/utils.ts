@@ -62,7 +62,6 @@ export function useDeepEqualMemo<T>(value: T): T {
 export function useRerender(): () => void {
     const rerender = useState(null)[1];
     return useCallback(() => {
-        console.log('rerender called', Date.now(), new Error().stack);
         rerender({});
     }, [rerender]);
 }
