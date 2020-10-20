@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.3](https://github.com/rocwind/create-fetcher/compare/v0.3.2...v0.3.3) (2020-10-20)
+
+
+### Features
+
+* improve the refresh render performance for useSWR hook by skip unnecessary rerender ([5d4df2f](https://github.com/rocwind/create-fetcher/commit/5d4df2fcf1122d3962f4d6a55aff34d887c29ea0))
+
+
+### Bug Fixes
+
+* calling fetch() immediately after clearCache() on fetcher should not get cached response ([099fd10](https://github.com/rocwind/create-fetcher/commit/099fd10c502fe162b8c6a79f2c35b3825709e595))
+* getFinalResponse() resolves if there is no error in last response ([0439372](https://github.com/rocwind/create-fetcher/commit/0439372850dc365a603daa905b80b96b47cc759e))
+
 ### [0.3.2](https://github.com/rocwind/create-fetcher/compare/v0.3.1...v0.3.2) (2020-09-24)
 
 
