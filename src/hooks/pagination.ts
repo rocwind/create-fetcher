@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
-import { useDeepEqualMemo, useRerender, isDeepEqual, useShallowEqualMemo } from './utils';
+import { useDeepEqualMemo, useHookStateRef, isDeepEqual, useShallowEqualMemo } from './utils';
 
 export type PaginationListOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
     /**
@@ -69,14 +69,13 @@ export function usePaginationList<L, T, R>(
     const initialRequestMemo = useDeepEqualMemo(initialRequest);
     const optionsMemo = useShallowEqualMemo(options);
 
-    // use ref to keep current state
-    const stateRef = useRef<PaginationListState<L, T>>({
-        list: [],
-        isLoading: false,
-        hasMore: true,
-    } as PaginationListState<L, T>);
-
-    const rerender = useRerender();
+    const [state, stateRef, updateState, cancelUpdate] = useHookStateRef<PaginationListState<L, T>>(
+        {
+            list: [],
+            isLoading: false,
+            hasMore: true,
+        } as PaginationListState<L, T>,
+    );
 
     const nextRequestRef = useRef<R>();
     const abortRef = useRef<() => void>();
@@ -88,16 +87,15 @@ export function usePaginationList<L, T, R>(
             stateRef.current.isLoading ||
             !stateRef.current.hasMore
         ) {
-            stateRef.current = Object.assign({}, stateRef.current, {
+            updateState({
                 data: undefined,
                 list: [],
                 error: undefined,
                 isLoading: false,
                 hasMore: true,
             });
-            rerender();
         }
-    }, [rerender]);
+    }, [updateState]);
 
     const load = useCallback(
         (isRefresh: boolean) => {
@@ -117,10 +115,9 @@ export function usePaginationList<L, T, R>(
 
             // mark loading state
             if (!stateRef.current.isLoading) {
-                stateRef.current = Object.assign({}, stateRef.current, {
+                updateState({
                     isLoading: true,
                 });
-                rerender();
             }
 
             // is first page if requesting request is the initial request
@@ -144,19 +141,19 @@ export function usePaginationList<L, T, R>(
                         const list = isInitialPage ? pageList : prevList.concat(pageList);
                         // compare if it changed before we update the list
                         if (list.length !== prevList.length || !isDeepEqual(list, prevList)) {
-                            stateRef.current = Object.assign({}, stateRef.current, {
+                            updateState({
                                 list,
                             });
                         }
 
-                        stateRef.current = Object.assign({}, stateRef.current, {
+                        updateState({
                             data,
                         });
                     }
 
                     if (!next) {
                         // no longer loading
-                        stateRef.current = Object.assign({}, stateRef.current, {
+                        updateState({
                             isLoading: false,
                         });
 
@@ -168,18 +165,16 @@ export function usePaginationList<L, T, R>(
                             );
 
                             // it still has more if there is nextRequest
-                            stateRef.current = Object.assign({}, stateRef.current, {
+                            updateState({
                                 hasMore: nextRequestRef.current != null,
                             });
                         }
                     }
 
                     // update with latest error
-                    stateRef.current = Object.assign({}, stateRef.current, {
+                    updateState({
                         error,
                     });
-
-                    rerender();
                 },
             );
         },
@@ -189,11 +184,11 @@ export function usePaginationList<L, T, R>(
     const loadMore = useCallback(() => {
         load(false);
     }, [load]);
-    stateRef.current.loadMore = loadMore;
+    state.loadMore = loadMore;
     const refresh = useCallback(() => {
         load(true);
     }, [load]);
-    stateRef.current.refresh = refresh;
+    state.refresh = refresh;
 
     useEffect(() => {
         nextRequestRef.current = initialRequestMemo;
@@ -206,9 +201,11 @@ export function usePaginationList<L, T, R>(
 
         return () => {
             abortRef.current?.();
+
+            cancelUpdate();
         };
-    }, [loadMore, initialRequestMemo, optionsMemo]);
-    return stateRef.current;
+    }, [loadMore, cancelUpdate, initialRequestMemo, optionsMemo]);
+    return state;
 }
 
 export function createPaginationListHook<L, T, R>(

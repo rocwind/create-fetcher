@@ -66,29 +66,55 @@ export function useRerender(): () => void {
     }, [rerender]);
 }
 
+// delay the update by 34 ms(2 frames at 60fps) to render new state
+// this gives time for loading cached data and skip
+// the component rerender if the state doesn't change
+const UPDATE_WAIT = 34;
 /**
  * debounced state update/rerender
- * @param state
- * @param wait
- * @param maxWait
+ * @returns [state, offscreenStateRef, updateState, cancel]
  */
-export function useRenderState<T>(state: MutableRefObject<T>, wait: number, maxWait: number) {
+export function useHookStateRef<T>(
+    initialState: T,
+): [T, MutableRefObject<T>, (fragment: Partial<T>) => void, () => void] {
     const rerender = useRerender();
-    return useCallback(
+    const onscreenStateRef = useRef<T>(initialState);
+    const offscreenStateRef = useRef<T>(initialState);
+    const update = useCallback(
         debounce(
-            (newState: T) => {
-                if (isShallowEqual(state.current, newState)) {
+            () => {
+                if (isDeepEqual(onscreenStateRef.current, offscreenStateRef.current)) {
                     return;
                 }
-                state.current = newState;
+                onscreenStateRef.current = offscreenStateRef.current;
                 rerender();
             },
-            wait,
+            UPDATE_WAIT,
             {
-                maxWait,
+                maxWait: UPDATE_WAIT,
                 trailing: true,
             },
         ),
-        [wait, maxWait, rerender],
+        [],
     );
+
+    return [
+        onscreenStateRef.current,
+        offscreenStateRef,
+        useCallback(
+            (fragment: Partial<T>) => {
+                offscreenStateRef.current = Object.assign(
+                    {},
+                    onscreenStateRef.current,
+                    offscreenStateRef.current,
+                    fragment,
+                );
+                update();
+            },
+            [update],
+        ),
+        useCallback(() => {
+            update.cancel();
+        }, [update]),
+    ];
 }
