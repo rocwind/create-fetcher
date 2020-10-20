@@ -1,6 +1,6 @@
 {
   "name": "create-fetcher",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "customizable data fetcher wrapper for remote data fetching",
   "type": "module",
   "main": "lib/index.js",
