@@ -102,7 +102,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
             return;
         }
         this.isAborted = true;
-        this.logger?.('aborted');
+        this.logger?.('abort called');
 
         this.responseResolve?.(createAbortError());
         if (this.isRequestSent) {

@@ -26,7 +26,7 @@ export class RequestFactory<T, R> {
                 cacheKey,
                 options,
                 request,
-                getFetcherRequestLogger('polling', options, cacheKey, this.logger),
+                getFetcherRequestLogger('polling', options, cacheKey, request, this.logger),
             );
         }
 
@@ -36,7 +36,7 @@ export class RequestFactory<T, R> {
                 cacheKey,
                 options,
                 request,
-                getFetcherRequestLogger('swr', options, cacheKey, this.logger),
+                getFetcherRequestLogger('swr', options, cacheKey, request, this.logger),
             );
         }
 
@@ -45,7 +45,7 @@ export class RequestFactory<T, R> {
             cacheKey,
             options,
             request,
-            getFetcherRequestLogger('swr', options, cacheKey, this.logger),
+            getFetcherRequestLogger('swr', options, cacheKey, request, this.logger),
         );
     }
 }

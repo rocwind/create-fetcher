@@ -65,15 +65,18 @@ export function proxyResponseWithAdditionalNext<T>(
     };
 }
 
-export function getFetcherRequestLogger(
+export function getFetcherRequestLogger<R>(
     name: string,
     options: FetcherRequestOptions<any>,
     cacheKey: string,
+    request?: R,
     logger?: Logger,
 ): Logger | undefined {
     if (!logger) {
         return;
     }
-    const fullCacheKey = `${options.cacheKeyPrefix}${cacheKey}`;
-    return (log: string) => logger(`${name}<${fullCacheKey}> ${log}`);
+    const fullRequestDesc = `${options.cacheKeyPrefix}${cacheKey.slice(0, 6)}(${JSON.stringify(
+        request,
+    )?.slice(0, 12)})`;
+    return (log: string) => logger(`${name}<${fullRequestDesc}> ${log}`);
 }

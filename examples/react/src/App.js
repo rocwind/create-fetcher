@@ -29,6 +29,7 @@ const timestampFetcher = createFetcher(
         cacheMode: CacheMode.Default,
         cacheMaxAge: 10,
         cacheMinFresh: 3,
+        log: true,
     },
 );
 
@@ -42,6 +43,7 @@ const echoFetcher = createFetcher(
         cache,
         cacheKeyPrefix: 'echo:',
         cacheMode: CacheMode.NoStore,
+        log: true,
     },
 );
 
@@ -56,6 +58,7 @@ const listFetcher = createFetcher(
         cacheKeyPrefix: 'list:',
         cacheMinFresh: 3,
         cacheMaxAge: 10,
+        log: true,
     },
 );
 
