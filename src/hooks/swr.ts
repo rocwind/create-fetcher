@@ -96,17 +96,6 @@ export function useSWR<T, R = void>(
     state.refresh = refresh;
 
     useEffect(() => {
-        // send request
-        // - reset state if it's previous loaded
-        if (stateRef.current.isLoaded || stateRef.current.error) {
-            updateState({
-                data: undefined,
-                error: undefined,
-                isLoaded: false,
-                isFreshOrValidated: false,
-            });
-        }
-
         // auto start
         const { manualStart } = optionsMemo ?? {};
         if (!manualStart) {
@@ -119,7 +108,7 @@ export function useSWR<T, R = void>(
             // cancel previous pending state update
             cancelUpdate();
         };
-    }, [fetcher, refresh, updateState, cancelUpdate, optionsMemo]);
+    }, [refresh, cancelUpdate, optionsMemo]);
 
     return state;
 }
