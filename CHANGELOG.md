@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.6](https://github.com/rocwind/create-fetcher/compare/v0.3.5...v0.3.6) (2020-10-23)
+
+
+### Bug Fixes
+
+* useSWR may reset the state after response received ([a34b706](https://github.com/rocwind/create-fetcher/commit/a34b70689b354532278d262b0009592c3fee2a2d))
+
 ### [0.3.5](https://github.com/rocwind/create-fetcher/compare/v0.3.4...v0.3.5) (2020-10-20)
 
 
