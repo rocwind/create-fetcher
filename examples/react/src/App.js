@@ -78,7 +78,9 @@ function App() {
     /**
      * polling for data updates each 2 seconds
      */
-    const { data: polling, isPolling, start, stop } = usePolling(timestampFetcher, 2);
+    const { data: polling, isPolling, start, stop } = usePolling(timestampFetcher, 2, null, {
+        manualStart: true,
+    });
 
     /**
      * pagination list hook by use its creator
@@ -104,23 +106,23 @@ function App() {
                 <DemoBoard
                     title={'useSWR()'}
                     data={swr}
-                    buttons={[{ title: 'refresh', onClick: refresh }]}
+                    buttons={[{ title: 'refresh', onClick: () => refresh() }]}
                 />
                 <DemoBoard title={'followed useSWR()'} data={swr2} />
                 <DemoBoard
                     title={'usePolling()'}
                     data={JSON.stringify({ data: polling, isPolling })}
                     buttons={[
-                        { title: 'start', onClick: start },
-                        { title: 'stop', onClick: stop },
+                        { title: 'start', onClick: () => start() },
+                        { title: 'stop', onClick: () => stop() },
                     ]}
                 />
                 <DemoBoard
                     title={'usePaginationList()'}
                     data={JSON.stringify({ list, hasMore, isLoading })}
                     buttons={[
-                        { title: 'loadMore', onClick: loadMore },
-                        { title: 'refresh', onClick: refreshList },
+                        { title: 'loadMore', onClick: () => loadMore() },
+                        { title: 'refresh', onClick: () => refreshList() },
                     ]}
                 />
             </tbody>

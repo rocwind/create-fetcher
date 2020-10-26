@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
-import { useDeepEqualMemo, useHookStateRef, useShallowEqualMemo } from './utils';
+import { useDeepEqualMemo, useHookStateRef, useShallowEqualMemo, isShallowEqual } from './utils';
 
 export type SWROptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
     /**
@@ -47,6 +47,9 @@ export function useSWR<T, R = void>(
     } as SWRState<T>);
 
     const abortRef = useRef<() => void>();
+    // keep track of last request & options for compare
+    const lastRequestRef = useRef<R>();
+    const lastOptionsRef = useRef<SWROptions<T>>();
 
     const refresh = useCallback(
         (cacheMode?: CacheMode) => {
@@ -62,10 +65,22 @@ export function useSWR<T, R = void>(
                 isLoaded: stateRef.current.data !== undefined,
             });
 
-            // abort previous request if there is any
-            abortRef.current?.();
+            if (abortRef.current) {
+                // skip request if there is a ongoing request with the same request and options
+                if (
+                    lastRequestRef.current === requestMemo &&
+                    isShallowEqual(lastOptionsRef.current, mergedOptions)
+                ) {
+                    return;
+                }
+
+                // abort previous request
+                abortRef.current();
+            }
 
             // send fetch request
+            lastRequestRef.current = requestMemo;
+            lastOptionsRef.current = mergedOptions;
             abortRef.current = forEachResponse(
                 fetcher.fetch(requestMemo, mergedOptions),
                 ({ data, error, next }) => {
@@ -104,7 +119,10 @@ export function useSWR<T, R = void>(
 
         return () => {
             // abort fetch if there is any pending request
-            abortRef.current?.();
+            if (abortRef.current) {
+                abortRef.current();
+                abortRef.current = undefined;
+            }
             // cancel previous pending state update
             cancelUpdate();
         };
