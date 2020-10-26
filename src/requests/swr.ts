@@ -122,11 +122,18 @@ class CacheControl<T> {
     }
 
     isFresh(key: string): boolean {
-        // treat cache as fresh for OnlyIfCached - no matter there is a cache or not
-        // so it won't fetch from remote
-        if (this.options.cacheMode === CacheMode.OnlyIfCached) {
-            return true;
+        switch (this.options.cacheMode) {
+            case CacheMode.OnlyIfCached:
+                // treat cache as fresh for OnlyIfCached - no matter there is a cache or not
+                // so it won't fetch from remote
+                return true;
+            case CacheMode.ForceLoad:
+                // treat cache as not fresh for ForceLoad, so it will always fetch from remote
+                return false;
+            default:
+                break;
         }
+
         const timestamp = this.timestampByKey.get(key);
         if (!timestamp) {
             return false;
@@ -139,6 +146,7 @@ class CacheControl<T> {
     }
 
     get(key: string): Promise<T | undefined> {
+        // force do not use cache
         switch (this.options.cacheMode) {
             case CacheMode.NoStore:
             case CacheMode.NoCache:
@@ -155,11 +163,17 @@ class CacheControl<T> {
             if (!this.timestampByKey.has(key)) {
                 this.timestampByKey.set(key, timestamp);
             }
-            // check cache expires or not for default mode
-            if (
-                this.options.cacheMode === CacheMode.Default &&
-                Date.now() - timestamp > this.options.cacheMaxAge * 1000
-            ) {
+            // force use cache
+            switch (this.options.cacheMode) {
+                case CacheMode.ForceCache:
+                case CacheMode.OnlyIfCached:
+                    return data;
+                default:
+                    break;
+            }
+
+            // check cache expires or not
+            if (Date.now() - timestamp > this.options.cacheMaxAge * 1000) {
                 return undefined;
             }
 

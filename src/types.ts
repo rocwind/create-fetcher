@@ -47,13 +47,17 @@ export enum CacheMode {
      */
     NoCache = 3,
     /**
-     * use local cache if it exists, even it's expired, otherwise load from network and store result to cache
+     * use local cache if it exists, even it is expired, otherwise load from network and store result to cache
      */
     ForceCache = 4,
     /**
-     * use local cache result, event it's expired
+     * use local cache result, event it is expired.
      */
     OnlyIfCached = 5,
+    /**
+     * use local cache if it is not expired, and load from network even it is fresh
+     */
+    ForceLoad = 6,
 }
 
 export enum BackoffMode {
