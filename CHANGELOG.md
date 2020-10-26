@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.7](https://github.com/rocwind/create-fetcher/compare/v0.3.6...v0.3.7) (2020-10-26)
+
+
+### Bug Fixes
+
+* swr hook should not abort previous request if new refresh call comes with the same request & options ([a7cbd13](https://github.com/rocwind/create-fetcher/commit/a7cbd13fa3a4476138e6b4a4a89248e2e3008faa))
+
 ### [0.3.6](https://github.com/rocwind/create-fetcher/compare/v0.3.5...v0.3.6) (2020-10-23)
 
 
