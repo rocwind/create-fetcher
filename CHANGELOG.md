@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.8](https://github.com/rocwind/create-fetcher/compare/v0.3.7...v0.3.8) (2020-10-27)
+
+
+### Features
+
+* support CacheMode.ForceLoad ([9a0f22e](https://github.com/rocwind/create-fetcher/commit/9a0f22e2afd17c8964fe96ba5a7218ed0df1cae3))
+
 ### [0.3.7](https://github.com/rocwind/create-fetcher/compare/v0.3.6...v0.3.7) (2020-10-26)
 
 
