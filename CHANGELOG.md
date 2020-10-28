@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.10](https://github.com/rocwind/create-fetcher/compare/v0.3.9...v0.3.10) (2020-10-28)
+
+
+### Bug Fixes
+
+* cache control should consider NoCache and NoStore cases as no fresh cache ([77f87e1](https://github.com/rocwind/create-fetcher/commit/77f87e1e1d5299a926a44bba64bee82c27e2a22b))
+
 ### [0.3.9](https://github.com/rocwind/create-fetcher/compare/v0.3.8...v0.3.9) (2020-10-28)
 
 
