@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.9](https://github.com/rocwind/create-fetcher/compare/v0.3.8...v0.3.9) (2020-10-28)
+
+
+### Bug Fixes
+
+* refresh@useSWR() will try to keep the most important refresh request with comparing the cacheMode ([38e5f4f](https://github.com/rocwind/create-fetcher/commit/38e5f4ff1f690537687ee20312a51f2f4e292a06))
+
 ### [0.3.8](https://github.com/rocwind/create-fetcher/compare/v0.3.7...v0.3.8) (2020-10-27)
 
 
