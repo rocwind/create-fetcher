@@ -36,16 +36,25 @@ export function isShallowEqual<T>(objA: T, objB: T): boolean {
     return true;
 }
 
+export function isEqualForKeys<T extends {}>(objA: T, objB: T, keys: (keyof T)[]): boolean {
+    for (let i = 0; i < keys.length; i++) {
+        if (!is(objA[keys[i]], objB[keys[i]])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+export function isDeepEqual<T>(value1: T, value2: T): boolean {
+    return isEqual(value1, value2);
+}
+
 export function useShallowEqualMemo<T>(value: T): T {
     const ref = useRef<T>();
     if (!isShallowEqual(value, ref.current)) {
         ref.current = value;
     }
     return ref.current;
-}
-
-export function isDeepEqual<T>(value1: T, value2: T): boolean {
-    return isEqual(value1, value2);
 }
 
 export function useDeepEqualMemo<T>(value: T): T {

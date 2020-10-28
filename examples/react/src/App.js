@@ -19,7 +19,9 @@ const cache = createLocalStorageCache();
 // resolves with current timestamp
 const timestampFetcher = createFetcher(
     () => {
+        console.log('timestamp request sending ...');
         return waitFor(500).then(() => {
+            console.log('timestamp request end.');
             return Date.now();
         });
     },
@@ -106,7 +108,14 @@ function App() {
                 <DemoBoard
                     title={'useSWR()'}
                     data={swr}
-                    buttons={[{ title: 'refresh', onClick: () => refresh() }]}
+                    buttons={[
+                        {
+                            title: 'refresh',
+                            onClick: () => {
+                                refresh(CacheMode.NoCache);
+                            },
+                        },
+                    ]}
                 />
                 <DemoBoard title={'followed useSWR()'} data={swr2} />
                 <DemoBoard

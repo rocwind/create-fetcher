@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
-import { useDeepEqualMemo, useHookStateRef, useShallowEqualMemo, isShallowEqual } from './utils';
+import { useDeepEqualMemo, useHookStateRef, useShallowEqualMemo, isEqualForKeys } from './utils';
 
 export type SWROptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
     /**
@@ -25,6 +25,27 @@ export interface SWRState<T> {
      * @param cacheMode optional override cacheMode for this refresh fetch
      */
     refresh: (cacheMode?: CacheMode) => void;
+}
+
+/**
+ * if there are new refresh request comes before previous request finished,
+ * keep the one with higher priority (in case the request itself and related options
+ * are the same)
+ * @param cacheMode
+ */
+function getSWRCacheModePriority(cacheMode?: CacheMode) {
+    switch (cacheMode) {
+        case CacheMode.NoCache:
+            return 4;
+        case CacheMode.NoStore:
+            return 3;
+        case CacheMode.ForceLoad:
+            return 2;
+        case CacheMode.ForceCache:
+            return 1;
+        default:
+            return 0;
+    }
 }
 
 /**
@@ -65,23 +86,28 @@ export function useSWR<T, R = void>(
                 isLoaded: stateRef.current.data !== undefined,
             });
 
+            // check if we need skip this refresh request
             if (abortRef.current) {
-                // skip request if there is a ongoing request with the same request and options
+                // skip request if there is a ongoing request with the same request and
+                // options that covers current refresh request
                 if (
                     lastRequestRef.current === requestMemo &&
-                    isShallowEqual(lastOptionsRef.current, mergedOptions)
+                    isEqualForKeys(lastOptionsRef.current, mergedOptions, [
+                        'cache',
+                        'cacheKey',
+                        'cacheKeyPrefix',
+                    ]) &&
+                    getSWRCacheModePriority(lastOptionsRef.current?.cacheMode) >=
+                        getSWRCacheModePriority(mergedOptions.cacheMode)
                 ) {
                     return;
                 }
-
-                // abort previous request
-                abortRef.current();
             }
 
             // send fetch request
             lastRequestRef.current = requestMemo;
             lastOptionsRef.current = mergedOptions;
-            abortRef.current = forEachResponse(
+            const thisAbort = forEachResponse(
                 fetcher.fetch(requestMemo, mergedOptions),
                 ({ data, error, next }) => {
                     // isFreshOrValidated: no next request
@@ -99,12 +125,16 @@ export function useSWR<T, R = void>(
                         isFreshOrValidated,
                     });
 
-                    if (!next) {
+                    if (!next && abortRef.current === thisAbort) {
                         // clear abort if request fully settled
                         abortRef.current = undefined;
                     }
                 },
             );
+
+            // abort previous request
+            abortRef.current?.();
+            abortRef.current = thisAbort;
         },
         [fetcher, updateState, requestMemo, optionsMemo],
     );
