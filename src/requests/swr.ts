@@ -127,8 +127,10 @@ class CacheControl<T> {
                 // treat cache as fresh for OnlyIfCached - no matter there is a cache or not
                 // so it won't fetch from remote
                 return true;
+            case CacheMode.NoStore:
+            case CacheMode.NoCache:
             case CacheMode.ForceLoad:
-                // treat cache as not fresh for ForceLoad, so it will always fetch from remote
+                // treat cache as not fresh, so it will always fetch from remote
                 return false;
             default:
                 break;
