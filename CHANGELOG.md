@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.11](https://github.com/rocwind/create-fetcher/compare/v0.3.10...v0.3.11) (2020-11-04)
+
+
+### Bug Fixes
+
+* **hooks:** useSWR resumes previous pending refresh request if it's aborted by rerender ([8603ce7](https://github.com/rocwind/create-fetcher/commit/8603ce781bab09f65c3e2649556ec6be6dde055b))
+
 ### [0.3.10](https://github.com/rocwind/create-fetcher/compare/v0.3.9...v0.3.10) (2020-10-28)
 
 
