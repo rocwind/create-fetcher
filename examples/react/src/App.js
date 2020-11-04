@@ -37,7 +37,7 @@ const timestampFetcher = createFetcher(
 
 const echoFetcher = createFetcher(
     (request) => {
-        return waitFor(500).then(() => {
+        return waitFor(1000).then(() => {
             return request;
         });
     },

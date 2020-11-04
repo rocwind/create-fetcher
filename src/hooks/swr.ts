@@ -69,6 +69,7 @@ export function useSWR<T, R = void>(
 
     const abortRef = useRef<() => void>();
     // keep track of last request & options for compare
+    const lastRefreshCacheMode = useRef<CacheMode>();
     const lastRequestRef = useRef<R>();
     const lastOptionsRef = useRef<SWROptions<T>>();
 
@@ -105,6 +106,7 @@ export function useSWR<T, R = void>(
             }
 
             // send fetch request
+            lastRefreshCacheMode.current = cacheMode;
             lastRequestRef.current = requestMemo;
             lastOptionsRef.current = mergedOptions;
             const thisAbort = forEachResponse(
@@ -140,11 +142,20 @@ export function useSWR<T, R = void>(
     );
     state.refresh = refresh;
 
+    const abortedOnCleanupRef = useRef(false);
     useEffect(() => {
-        // auto start
-        const { manualStart } = optionsMemo ?? {};
-        if (!manualStart) {
-            refresh();
+        // check if there is any pending refresh need to be resume
+        if (abortedOnCleanupRef.current) {
+            // resume previous pending refresh
+            // it was aborted by the cleanup
+            refresh(lastRefreshCacheMode.current);
+            abortedOnCleanupRef.current = false;
+        } else {
+            // auto start
+            const { manualStart } = optionsMemo ?? {};
+            if (!manualStart) {
+                refresh();
+            }
         }
 
         return () => {
@@ -152,6 +163,7 @@ export function useSWR<T, R = void>(
             if (abortRef.current) {
                 abortRef.current();
                 abortRef.current = undefined;
+                abortedOnCleanupRef.current = true;
             }
             // cancel previous pending state update
             cancelUpdate();
