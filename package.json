@@ -15,7 +15,7 @@
     "compile": "tsc --outDir lib -d",
     "start": "npm run compile -- --watch",
     "release": "npm test && npm run build && standard-version && git push --follow-tags origin master && npm publish",
-    "test": "jest"
+    "test": "jest --forceExit"
   },
   "repository": {
     "type": "git",
