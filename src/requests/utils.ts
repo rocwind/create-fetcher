@@ -65,13 +65,25 @@ export function proxyResponseWithAdditionalNext<T>(
     };
 }
 
+function getLogger(options: FetcherOptions<any>): Logger {
+    if (!options.log) {
+        return undefined;
+    }
+
+    if (typeof options.log === 'function') {
+        return options.log;
+    }
+
+    return console.log;
+}
+
 export function getFetcherRequestLogger<R>(
     name: string,
     options: FetcherRequestOptions<any>,
     cacheKey: string,
     request?: R,
-    logger?: Logger,
 ): Logger | undefined {
+    const logger = getLogger(options);
     if (!logger) {
         return;
     }

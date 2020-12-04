@@ -1,5 +1,5 @@
 import hash from 'object-hash';
-import { RequestCreator, Logger } from '../types';
+import { RequestCreator } from '../types';
 import {
     FetcherRequest,
     RequestControl,
@@ -13,7 +13,7 @@ import { PollingFetcherRequest } from './polling';
 export class RequestFactory<T, R> {
     private requestControl: RequestControl<T, R>;
 
-    constructor(requestCreator: RequestCreator<T, R>, private logger?: Logger) {
+    constructor(requestCreator: RequestCreator<T, R>) {
         this.requestControl = new RequestControlImpl(requestCreator);
     }
 
@@ -26,7 +26,7 @@ export class RequestFactory<T, R> {
                 cacheKey,
                 options,
                 request,
-                getFetcherRequestLogger('polling', options, cacheKey, request, this.logger),
+                getFetcherRequestLogger('polling', options, cacheKey, request),
             );
         }
 
@@ -36,7 +36,7 @@ export class RequestFactory<T, R> {
                 cacheKey,
                 options,
                 request,
-                getFetcherRequestLogger('swr', options, cacheKey, request, this.logger),
+                getFetcherRequestLogger('swr', options, cacheKey, request),
             );
         }
 
@@ -45,7 +45,7 @@ export class RequestFactory<T, R> {
             cacheKey,
             options,
             request,
-            getFetcherRequestLogger('swr', options, cacheKey, request, this.logger),
+            getFetcherRequestLogger('swr', options, cacheKey, request),
         );
     }
 }

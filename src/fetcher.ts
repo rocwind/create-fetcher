@@ -31,7 +31,7 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
     private ongoingClearCache = Promise.resolve();
     constructor(requestCreator: RequestCreator<T, R>, options: FetcherOptions<T>) {
         this.config(options);
-        this.requestFactory = new RequestFactory(requestCreator, getLogger(options));
+        this.requestFactory = new RequestFactory(requestCreator);
     }
 
     config(options) {
@@ -86,16 +86,4 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
             }),
         };
     }
-}
-
-function getLogger(options: FetcherOptions<any>): Logger {
-    if (!options.log) {
-        return undefined;
-    }
-
-    if (typeof options.log === 'function') {
-        return options.log;
-    }
-
-    return console.log;
 }
