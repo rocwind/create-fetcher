@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.12](https://github.com/rocwind/create-fetcher/compare/v0.3.11...v0.3.12) (2020-12-04)
+
+
+### Bug Fixes
+
+* make log configurable for each request ([1a77de3](https://github.com/rocwind/create-fetcher/commit/1a77de38755eb7d3445190f403cb1f0a03d4102f))
+
 ### [0.3.11](https://github.com/rocwind/create-fetcher/compare/v0.3.10...v0.3.11) (2020-11-04)
 
 
