@@ -7,6 +7,7 @@ import {
     useSWRHookCreator,
 } from 'create-fetcher/lib/hooks';
 import { createLocalStorageCache } from 'create-fetcher/lib/caches/localStorage';
+import { useReducer } from 'react';
 
 const waitFor = (delayed) =>
     new Promise((resolve) => {
@@ -52,7 +53,7 @@ const echoFetcher = createFetcher(
 const listFetcher = createFetcher(
     (index) => {
         return waitFor(500).then(() => {
-            return index + (Math.random() > 0.5 ? 1 : 0);
+            return index;
         });
     },
     {
@@ -97,10 +98,15 @@ function App() {
             return null;
         },
     );
+    const [paginationInitialRequest, togglePaginationInitialRequest] = useReducer((state) => {
+        return state ? 0 : 1;
+    }, 0);
     /**
      * use the pagination list hook
      */
-    const { list, isLoading, hasMore, loadMore, refresh: refreshList } = usePaginationListHook(0);
+    const { list, isLoading, hasMore, loadMore, refresh: refreshList } = usePaginationListHook(
+        paginationInitialRequest,
+    );
 
     return (
         <table>
@@ -132,6 +138,10 @@ function App() {
                     buttons={[
                         { title: 'loadMore', onClick: () => loadMore() },
                         { title: 'refresh', onClick: () => refreshList() },
+                        {
+                            title: 'update initial request',
+                            onClick: () => togglePaginationInitialRequest(),
+                        },
                     ]}
                 />
             </tbody>
@@ -143,7 +153,6 @@ function DemoBoard({ title, data, buttons }) {
     return (
         <tr>
             <td>{title}</td>
-            <td>{data ?? 'no data'}</td>
             <td>
                 {buttons?.map((item, index) => {
                     return (
@@ -153,6 +162,7 @@ function DemoBoard({ title, data, buttons }) {
                     );
                 })}
             </td>
+            <td>{data ?? 'no data'}</td>
         </tr>
     );
 }

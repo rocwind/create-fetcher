@@ -99,6 +99,15 @@ export function usePaginationList<L, T, R>(
 
     const load = useCallback(
         (isRefresh: boolean) => {
+            if (
+                !isRefresh &&
+                // loading is in progress, skip
+                (abortRef.current ||
+                    // skip if loadMore on nothing more
+                    nextRequestRef.current === null)
+            ) {
+                return;
+            }
             // abort previous load
             abortRef.current?.();
 
@@ -108,17 +117,10 @@ export function usePaginationList<L, T, R>(
                 nextRequestRef.current = initialRequestMemo;
             }
 
-            // skip if loadMore on nothing more
-            if (!isRefresh && !stateRef.current.hasMore) {
-                return;
-            }
-
             // mark loading state
-            if (!stateRef.current.isLoading) {
-                updateState({
-                    isLoading: true,
-                });
-            }
+            updateState({
+                isLoading: true,
+            });
 
             // is first page if requesting request is the initial request
             const isInitialPage = nextRequestRef.current === initialRequestMemo;
@@ -132,7 +134,7 @@ export function usePaginationList<L, T, R>(
                 });
             }
 
-            abortRef.current = forEachResponse(
+            const thisAbort = forEachResponse(
                 fetcher.fetch(nextRequestRef.current, mergedOptions),
                 ({ data, error, next }) => {
                     if (data !== undefined) {
@@ -169,6 +171,10 @@ export function usePaginationList<L, T, R>(
                                 hasMore: nextRequestRef.current != null,
                             });
                         }
+
+                        if (abortRef.current === thisAbort) {
+                            abortRef.current = undefined;
+                        }
                     }
 
                     // update with latest error
@@ -177,6 +183,7 @@ export function usePaginationList<L, T, R>(
                     });
                 },
             );
+            abortRef.current = thisAbort;
         },
         [resetState, listExtractor, nextRequestCreator, initialRequestMemo, optionsMemo],
     );
@@ -201,6 +208,7 @@ export function usePaginationList<L, T, R>(
 
         return () => {
             abortRef.current?.();
+            abortRef.current = undefined;
 
             cancelUpdate();
         };
