@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.13](https://github.com/rocwind/create-fetcher/compare/v0.3.12...v0.3.13) (2021-01-23)
+
+
+### Bug Fixes
+
+* usePaginationList() do not abort previous ongoing load request when loadMore() being called ([32f814b](https://github.com/rocwind/create-fetcher/commit/32f814b264bc8dee8b1ae1bd8c6ead5007bbbc66))
+
 ### [0.3.12](https://github.com/rocwind/create-fetcher/compare/v0.3.11...v0.3.12) (2020-12-04)
 
 
