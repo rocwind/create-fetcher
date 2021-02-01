@@ -1,11 +1,6 @@
 import hash from 'object-hash';
-import { RequestCreator } from '../types';
-import {
-    FetcherRequest,
-    RequestControl,
-    FetcherRequestOptions,
-    getFetcherRequestLogger,
-} from './utils';
+import { RequestCreator, RequestOptions } from '../types';
+import { FetcherRequest, RequestControl, getFetcherRequestLogger } from './utils';
 import { SWRFetcherRequest } from './swr';
 import { ROEFetcherRequest } from './roe';
 import { PollingFetcherRequest } from './polling';
@@ -17,7 +12,7 @@ export class RequestFactory<T, R> {
         this.requestControl = new RequestControlImpl(requestCreator);
     }
 
-    getRequest(options: FetcherRequestOptions<T>, request?: R): FetcherRequest<T> {
+    getRequest(options: RequestOptions, request?: R): FetcherRequest<T> {
         const cacheKey = options?.cacheKey ?? hash.MD5(request ?? null);
 
         if (typeof options.pollingWaitTime === 'number') {

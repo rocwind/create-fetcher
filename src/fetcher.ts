@@ -13,13 +13,13 @@ import { createMemoryCache } from './caches/memory';
 import { KeyPrefixHelper } from './caches/utils';
 import { RequestFactory } from './requests/factory';
 
-const defaultFetcherOptions: FetcherOptions<any> = {
+const defaultFetcherOptions: FetcherOptions = {
     cacheMode: CacheMode.Default,
     cacheMaxAge: 3600,
     cacheMinFresh: 1,
 };
 
-const defaultRequestOptions: RequestOptions<any> = {
+const defaultRequestOptions: RequestOptions = {
     retryTimes: 0,
     retryBackoff: BackoffMode.JitteredExponential,
     retryInitialWaitTime: 1,
@@ -29,7 +29,7 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
     private options = Object.assign({}, defaultFetcherOptions, { cache: createMemoryCache() });
     private requestFactory: RequestFactory<T, R>;
     private ongoingClearCache = Promise.resolve();
-    constructor(requestCreator: RequestCreator<T, R>, options: FetcherOptions<T>) {
+    constructor(requestCreator: RequestCreator<T, R>, options: FetcherOptions) {
         this.config(options);
         this.requestFactory = new RequestFactory(requestCreator);
     }
@@ -38,7 +38,7 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
         Object.assign(this.options, options);
     }
 
-    clearCache(maxAge?: number, cache?: Cache<CachedData<T>>) {
+    clearCache(maxAge?: number, cache?: Cache<unknown>) {
         const cacheToClear = cache ?? this.options.cache;
         const prefixHelper = new KeyPrefixHelper(this.options.cacheKeyPrefix);
         // serialize the calls to clearCache() and have fetch wait for the clearCache finish
@@ -50,7 +50,7 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
                         .filter((key) => prefixHelper.matchPrefix(key))
                         .map((key) => {
                             if (maxAge > 0) {
-                                return cacheToClear.get(key).then((data) => {
+                                return cacheToClear.get(key).then((data: CachedData<unknown>) => {
                                     // cache is valid
                                     if (data?.timestamp + maxAge * 1000 > Date.now()) {
                                         return;
@@ -72,7 +72,7 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
         return thisClearCache;
     }
 
-    fetch(request?: R, options?: RequestOptions<T>) {
+    fetch(request?: R, options?: RequestOptions) {
         const mergedOptions = Object.assign({}, defaultRequestOptions, this.options, options);
 
         const fetcherRequest = this.requestFactory.getRequest(mergedOptions, request);

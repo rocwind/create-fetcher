@@ -1,4 +1,4 @@
-import { RequestResponse, CacheMode, Logger } from '../types';
+import { RequestResponse, CacheMode, Logger, RequestOptions } from '../types';
 import {
     FetcherRequest,
     createAbortError,
@@ -6,7 +6,6 @@ import {
     PromiseResolve,
     createPromise,
     proxyResponseWithAdditionalNext,
-    FetcherRequestOptions,
 } from './utils';
 import { ROEFetcherRequest } from './roe';
 import { SWRFetcherRequest } from './swr';
@@ -23,7 +22,7 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
     constructor(
         private requestControl: RequestControl<T, R>,
         private cacheKey: string,
-        private options: FetcherRequestOptions<T>,
+        private options: RequestOptions,
         private request?: R,
         private logger?: Logger,
     ) {}
@@ -44,21 +43,22 @@ export class PollingFetcherRequest<T, R> implements FetcherRequest<T> {
             const options = isFirstRequest ? this.options : optionsWithNoCache;
             isFirstRequest = false;
 
-            this.innerRequest = this.options.retryTimes > 0
-                ? new ROEFetcherRequest(
-                      this.requestControl,
-                      this.cacheKey,
-                      options,
-                      this.request,
-                      this.logger,
-                  )
-                : new SWRFetcherRequest(
-                      this.requestControl,
-                      this.cacheKey,
-                      options,
-                      this.request,
-                      this.logger,
-                  );
+            this.innerRequest =
+                this.options.retryTimes > 0
+                    ? new ROEFetcherRequest(
+                          this.requestControl,
+                          this.cacheKey,
+                          options,
+                          this.request,
+                          this.logger,
+                      )
+                    : new SWRFetcherRequest(
+                          this.requestControl,
+                          this.cacheKey,
+                          options,
+                          this.request,
+                          this.logger,
+                      );
 
             this.innerRequest.run().then((response) => {
                 // this.responseResolve might be replaced inside the creating proxy response method

@@ -1,4 +1,4 @@
-import { RequestResponse, BackoffMode, CacheMode, Logger } from '../types';
+import { RequestResponse, BackoffMode, CacheMode, Logger, RequestOptions } from '../types';
 import {
     FetcherRequest,
     createAbortError,
@@ -7,7 +7,6 @@ import {
     proxyResponseWithAdditionalNext,
     AbortErrorName,
     PromiseResolve,
-    FetcherRequestOptions,
 } from './utils';
 import { SWRFetcherRequest } from './swr';
 
@@ -23,7 +22,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
     constructor(
         private requestControl: RequestControl<T, R>,
         private cacheKey: string,
-        private options: FetcherRequestOptions<T>,
+        private options: RequestOptions,
         private request?: R,
         private logger?: Logger,
     ) {
@@ -121,7 +120,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
 class RetryControl<T> {
     private retriedTimes = 0;
     private retryTimeout: ReturnType<typeof setTimeout>;
-    constructor(private options: FetcherRequestOptions<T>) {
+    constructor(private options: RequestOptions) {
         this.reset();
     }
 

@@ -3,7 +3,7 @@ import debounce from 'lodash.debounce';
 import isEqual from 'lodash.isequal';
 
 // Object.is - with +0 -0 case ignored
-function is(x: any, y: any): boolean {
+function is(x: unknown, y: unknown): boolean {
     if (x === y) {
         return true;
     } else {

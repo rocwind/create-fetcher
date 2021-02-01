@@ -3,12 +3,12 @@ import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
 import { useDeepEqualMemo, useHookStateRef, isDeepEqual, useShallowEqualMemo } from './utils';
 
-export type PaginationListOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
+export interface PaginationListOptions extends Omit<RequestOptions, 'pollingWaitTime'> {
     /**
      * start the request by manual call `refresh()` or `loadMore()`, default is false
      */
     manualStart?: boolean;
-};
+}
 
 export interface PaginationListState<L, T> {
     /**
@@ -64,7 +64,7 @@ export function usePaginationList<L, T, R>(
     listExtractor: ListExtractor<T, L>,
     nextRequestCreator: NextRequestCreator<T, R>,
     initialRequest?: R,
-    options?: PaginationListOptions<T>,
+    options?: PaginationListOptions,
 ): PaginationListState<L, T> {
     const initialRequestMemo = useDeepEqualMemo(initialRequest);
     const optionsMemo = useShallowEqualMemo(options);
@@ -221,10 +221,7 @@ export function createPaginationListHook<L, T, R>(
     listExtractor: ListExtractor<T, L>,
     nextRequestCreator: NextRequestCreator<T, R>,
 ) {
-    return function usePaginationListWrapper(
-        initialRequest?: R,
-        options?: PaginationListOptions<T>,
-    ) {
+    return function usePaginationListWrapper(initialRequest?: R, options?: PaginationListOptions) {
         return usePaginationList(
             fetcher,
             listExtractor,

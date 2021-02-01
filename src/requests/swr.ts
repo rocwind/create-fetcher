@@ -1,4 +1,4 @@
-import { RequestResponse, CacheMode, Logger } from '../types';
+import { RequestResponse, CacheMode, Logger, CachedData, FetcherOptions } from '../types';
 import { KeyPrefixHelper } from '../caches/utils';
 import {
     FetcherRequest,
@@ -6,7 +6,6 @@ import {
     RequestControl,
     createPromise,
     PromiseResolve,
-    FetcherRequestOptions,
 } from './utils';
 
 /**
@@ -21,7 +20,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
     constructor(
         private requestControl: RequestControl<T, R>,
         private cacheKey: string,
-        options: FetcherRequestOptions<T>,
+        options: FetcherOptions,
         private request?: R,
         private logger?: Logger,
     ) {
@@ -117,7 +116,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
 class CacheControl<T> {
     private prefixHelper: KeyPrefixHelper;
     private timestampByKey = new Map<string, number>();
-    constructor(private options: FetcherRequestOptions<T>) {
+    constructor(private options: FetcherOptions) {
         this.prefixHelper = new KeyPrefixHelper(options.cacheKeyPrefix);
     }
 
@@ -157,30 +156,32 @@ class CacheControl<T> {
                 break;
         }
 
-        return this.options.cache.get(this.prefixHelper.appendPrefix(key)).then((cachedData) => {
-            if (cachedData === undefined) {
-                return undefined;
-            }
-            const { data, timestamp } = cachedData;
-            if (!this.timestampByKey.has(key)) {
-                this.timestampByKey.set(key, timestamp);
-            }
-            // force use cache
-            switch (this.options.cacheMode) {
-                case CacheMode.ForceCache:
-                case CacheMode.OnlyIfCached:
-                    return data;
-                default:
-                    break;
-            }
+        return this.options.cache
+            .get(this.prefixHelper.appendPrefix(key))
+            .then((cachedData: CachedData<T>) => {
+                if (cachedData === undefined) {
+                    return undefined;
+                }
+                const { data, timestamp } = cachedData;
+                if (!this.timestampByKey.has(key)) {
+                    this.timestampByKey.set(key, timestamp);
+                }
+                // force use cache
+                switch (this.options.cacheMode) {
+                    case CacheMode.ForceCache:
+                    case CacheMode.OnlyIfCached:
+                        return data;
+                    default:
+                        break;
+                }
 
-            // check cache expires or not
-            if (Date.now() - timestamp > this.options.cacheMaxAge * 1000) {
-                return undefined;
-            }
+                // check cache expires or not
+                if (Date.now() - timestamp > this.options.cacheMaxAge * 1000) {
+                    return undefined;
+                }
 
-            return data;
-        });
+                return data;
+            });
     }
 
     set(key: string, value: T): Promise<void> {

@@ -11,7 +11,7 @@ export * from './utils';
  */
 export const createFetcher = <T, R = void>(
     requestCreator: RequestCreator<T, R>,
-    options: FetcherOptions<T>,
+    options: FetcherOptions,
 ): Fetcher<T, R> => {
     return new FetcherImpl(requestCreator, options);
 };

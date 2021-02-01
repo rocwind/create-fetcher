@@ -3,12 +3,12 @@ import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
 import { useDeepEqualMemo, useHookStateRef, useShallowEqualMemo, isEqualForKeys } from './utils';
 
-export type SWROptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
+export interface SWROptions extends Omit<RequestOptions, 'pollingWaitTime'> {
     /**
      * start the fetch request by manual call `refresh()` (don't auto start), default is false
      */
     manualStart?: boolean;
-};
+}
 export interface SWRState<T> {
     data?: T;
     error?: Error;
@@ -57,7 +57,7 @@ function getSWRCacheModePriority(cacheMode?: CacheMode) {
 export function useSWR<T, R = void>(
     fetcher: Fetcher<T, R>,
     request?: R,
-    options?: SWROptions<T>,
+    options?: SWROptions,
 ): SWRState<T> {
     const requestMemo = useDeepEqualMemo(request);
     const optionsMemo = useShallowEqualMemo(options);
@@ -71,7 +71,7 @@ export function useSWR<T, R = void>(
     // keep track of last request & options for compare
     const lastRefreshCacheMode = useRef<CacheMode>();
     const lastRequestRef = useRef<R>();
-    const lastOptionsRef = useRef<SWROptions<T>>();
+    const lastOptionsRef = useRef<SWROptions>();
 
     const refresh = useCallback(
         (cacheMode?: CacheMode) => {
@@ -174,7 +174,7 @@ export function useSWR<T, R = void>(
 }
 
 export function createSWRHook<T, R = void>(fetcher: Fetcher<T, R>) {
-    return function useSWRWrapper(request?: R, options?: SWROptions<T>) {
+    return function useSWRWrapper(request?: R, options?: SWROptions) {
         return useSWR(fetcher, request, options);
     };
 }

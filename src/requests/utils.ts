@@ -1,6 +1,4 @@
-import { RequestResponse, FetcherOptions, RequestOptions, Logger } from '../types';
-
-export type FetcherRequestOptions<T> = FetcherOptions<T> & RequestOptions<T>;
+import { RequestResponse, FetcherOptions, Logger } from '../types';
 
 export interface FetcherRequest<T> {
     run(): Promise<RequestResponse<T>>;
@@ -14,7 +12,7 @@ export interface RequestControl<T, R> {
 
 export const AbortErrorName = 'AbortError';
 
-export function createAbortError(): RequestResponse<any> {
+export function createAbortError<T>(): RequestResponse<T> {
     const error = new Error('Aborted');
     error.name = AbortErrorName;
     return { error };
@@ -65,7 +63,7 @@ export function proxyResponseWithAdditionalNext<T>(
     };
 }
 
-function getLogger(options: FetcherOptions<any>): Logger {
+function getLogger(options: FetcherOptions): Logger {
     if (!options.log) {
         return undefined;
     }
@@ -79,7 +77,7 @@ function getLogger(options: FetcherOptions<any>): Logger {
 
 export function getFetcherRequestLogger<R>(
     name: string,
-    options: FetcherRequestOptions<any>,
+    options: FetcherOptions,
     cacheKey: string,
     request?: R,
 ): Logger | undefined {

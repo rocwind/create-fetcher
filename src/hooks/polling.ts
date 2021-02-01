@@ -3,12 +3,12 @@ import { Fetcher, RequestOptions } from '../types';
 import { forEachResponse } from '../utils';
 import { useDeepEqualMemo, useRerender, useShallowEqualMemo } from './utils';
 
-export type PollingOptions<T> = Omit<RequestOptions<T>, 'pollingWaitTime'> & {
+export interface PollingOptions extends Omit<RequestOptions, 'pollingWaitTime'> {
     /**
      * start the polling by manual call `start()` (don't auto start), default is false
      */
     manualStart?: boolean;
-};
+}
 
 export interface PollingState<T> {
     data?: T;
@@ -38,7 +38,7 @@ export function usePolling<T, R = void>(
     fetcher: Fetcher<T, R>,
     pollingWaitTime: number,
     request?: R,
-    options?: PollingOptions<T>,
+    options?: PollingOptions,
 ): PollingState<T> {
     const requestMemo = useDeepEqualMemo(request);
     const optionsMemo = useShallowEqualMemo(options);
@@ -114,7 +114,7 @@ export function usePolling<T, R = void>(
 }
 
 export function createPollingHook<T, R = void>(fetcher: Fetcher<T, R>, pollingWaitTime: number) {
-    return function usePollingWrapper(request?: R, options?: PollingOptions<T>) {
+    return function usePollingWrapper(request?: R, options?: PollingOptions) {
         return usePolling(fetcher, pollingWaitTime, request, options);
     };
 }

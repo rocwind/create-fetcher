@@ -88,11 +88,11 @@ export type Logger = (log: string) => void;
 /**
  * Options for fetcher
  */
-export interface FetcherOptions<T> {
+export interface FetcherOptions {
     /**
      * cache, default to memory cache
      */
-    cache?: Cache<CachedData<T>>;
+    cache?: Cache<unknown>;
     /**
      * cache mode, default to CacheMode.Default
      */
@@ -120,7 +120,7 @@ export interface FetcherOptions<T> {
 /**
  * Options for one time fetcher request, it overrides fetch options if there is any conflicts
  */
-export type RequestOptions<T> = FetcherOptions<T> & {
+export interface RequestOptions extends FetcherOptions {
     /**
      * override default cache key
      */
@@ -146,7 +146,7 @@ export type RequestOptions<T> = FetcherOptions<T> & {
      * set this option to turn on polling
      */
     pollingWaitTime?: number;
-};
+}
 
 /**
  * Response data structure for a fetch request
@@ -189,18 +189,18 @@ export interface Fetcher<T, R = void> {
      * @param request request params
      * @param options
      */
-    fetch(request?: R, options?: RequestOptions<T>): RequestReturn<T>;
+    fetch(request?: R, options?: RequestOptions): RequestReturn<T>;
     /**
      * update fetcher options
      * @param options fetch options to set
      */
-    config(options: FetcherOptions<T>): void;
+    config(options: FetcherOptions): void;
     /**
      * clear cached responses
      * @param maxAge only keys older than maxAge will be cleared if set
      * @param cache cache to be cleared, default is the cache set in fetcher options
      */
-    clearCache(maxAge?: number, cache?: Cache<CachedData<T>>): Promise<void>;
+    clearCache(maxAge?: number, cache?: Cache<unknown>): Promise<void>;
 }
 
 /**
