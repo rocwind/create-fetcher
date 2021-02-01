@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/rocwind/create-fetcher/compare/v0.3.13...v0.4.0) (2021-02-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* FetcherOptions, RequestOptions, PaginationListOptions, PollingOptions, SWROptions are no longer generic classes
+
+* update types, remove the use of any type and simplify Options types by remove generics ([2ad8cbd](https://github.com/rocwind/create-fetcher/commit/2ad8cbd7dbadda8011611d1b0f73829665168ae8))
+
 ### [0.3.13](https://github.com/rocwind/create-fetcher/compare/v0.3.12...v0.3.13) (2021-01-23)
 
 
