@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/rocwind/create-fetcher/compare/v0.4.0...v0.5.0) (2021-02-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **storage:** switch to @react-native-async-storage/async-storage package for async-storage
+
+### Bug Fixes
+
+* **storage:** switch to @react-native-async-storage/async-storage package for async-storage ([aa43079](https://github.com/rocwind/create-fetcher/commit/aa4307933eb7152fa789d0c15f7a06b178be0598))
+
 ## [0.4.0](https://github.com/rocwind/create-fetcher/compare/v0.3.13...v0.4.0) (2021-02-01)
 
 
