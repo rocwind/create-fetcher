@@ -47,6 +47,35 @@ export function getFinalResponse<T>(requestReturn: RequestReturn<T>): Promise<T>
     return promise;
 }
 
+/**
+ * helper for handle each fetcher.fetch() response
+ * and returns the initial data it receives no matter it comes from valid cache or network
+ * NOTE:
+ *  - it only reject with error if there is no any data available
+ *  - this method SHOULD NOT be used together with polling requests - which never ends
+ * @param requestReturn the fetcher.fetch() request return
+ */
+export function getInitialResponse<T>(requestReturn: RequestReturn<T>): Promise<T> {
+    const { promise, resolve, reject } = createPromise<T>();
+    let resolved = false;
+    forEachResponse(requestReturn, ({ data, error, next }) => {
+        if (data !== undefined && !resolved) {
+            resolved = true;
+            resolve(data);
+            return;
+        }
+
+        if (!next && !resolved) {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(undefined);
+            }
+        }
+    });
+    return promise;
+}
+
 export type PureFetch<T, R = void> = (request?: R) => Promise<T>;
 /**
  * fallback to a pure fetch function, which uses no cache store and return plain promise wrapped response
@@ -69,12 +98,12 @@ export function fallbackToPureFetch<T, R = void>(fetcher: Fetcher<T, R>): PureFe
  * @param cache cache to be cleared
  * @param maxAge only keys older than max age will be cleared if maxAge set
  */
-export function clearCache<T>(cache: Cache<CachedData<T>>, maxAge?: number): Promise<void> {
+export function clearCache(cache: Cache<unknown>, maxAge?: number): Promise<void> {
     return cache.getKeys().then((keys) =>
         Promise.all(
             keys.map((key) => {
                 if (maxAge > 0) {
-                    return cache.get(key).then((data) => {
+                    return cache.get(key).then((data: CachedData<unknown>) => {
                         // cache is valid
                         if (data?.timestamp + maxAge * 1000 > Date.now()) {
                             return;
