@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.2](https://github.com/rocwind/create-fetcher/compare/v0.5.1...v0.5.2) (2021-03-16)
+
+
+### Bug Fixes
+
+* ignore request object prototype in default cache key ([f31bccf](https://github.com/rocwind/create-fetcher/commit/f31bccf7b7928be9d80dc97c43ce8815f06440d2))
+
 ### [0.5.1](https://github.com/rocwind/create-fetcher/compare/v0.5.0...v0.5.1) (2021-03-09)
 
 
