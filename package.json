@@ -12,7 +12,7 @@
   "scripts": {
     "clean": "rm -rf lib",
     "build": "npm run clean && npm run compile",
-    "compile": "tsc --outDir lib -d",
+    "compile": "tsc -d",
     "start": "npm run compile -- --watch",
     "release": "npm test && npm run build && standard-version && git push --follow-tags origin master && npm publish",
     "test": "jest --forceExit"
