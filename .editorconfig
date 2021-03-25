@@ -8,8 +8,6 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.json]
+[{*.json,*.yml}]
 indent_size = 2
 
-[{jest.config.js,.travis.yml}]
-indent_size = 2
