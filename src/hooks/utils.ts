@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, MutableRefObject } from 'react';
 import debounce from 'lodash.debounce';
-import isEqual from 'lodash.isequal';
+import isEqual from 'fast-deep-equal';
 
 // Object.is - with +0 -0 case ignored
 function is(x: unknown, y: unknown): boolean {
