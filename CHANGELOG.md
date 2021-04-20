@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.3](https://github.com/rocwind/create-fetcher/compare/v0.5.2...v0.5.3) (2021-04-20)
+
+
+### Bug Fixes
+
+* use fast-deep-equal replace lodash.isequal ([8b3ab3e](https://github.com/rocwind/create-fetcher/commit/8b3ab3e0d79a8115039570e1f68f063138c3145c))
+
 ### [0.5.2](https://github.com/rocwind/create-fetcher/compare/v0.5.1...v0.5.2) (2021-03-16)
 
 
