@@ -49,6 +49,11 @@ export function isDeepEqual<T>(value1: T, value2: T): boolean {
     return isEqual(value1, value2);
 }
 
+/**
+ * use memo instance if value is consider to be not changed during render by shallow equal comparsion
+ * @param value
+ * @returns
+ */
 export function useShallowEqualMemo<T>(value: T): T {
     const ref = useRef<T>();
     if (!isShallowEqual(value, ref.current)) {
@@ -57,6 +62,11 @@ export function useShallowEqualMemo<T>(value: T): T {
     return ref.current;
 }
 
+/**
+ * use memo instance if value is consider to be not changed during render by deep equal comparsion
+ * @param value
+ * @returns
+ */
 export function useDeepEqualMemo<T>(value: T): T {
     const ref = useRef<T>();
     if (!isDeepEqual(value, ref.current)) {
