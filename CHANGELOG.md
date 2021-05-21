@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.4](https://github.com/rocwind/create-fetcher/compare/v0.5.3...v0.5.4) (2021-05-21)
+
+
+### Bug Fixes
+
+* expose useShallowEqualMemo(), useDeepEqualMemo() to hooks entry file ([c34385a](https://github.com/rocwind/create-fetcher/commit/c34385acd37fa5b326b95b6035d20c0a862daeb4))
+* update ref value in useEffect() for memo hooks ([c1a747e](https://github.com/rocwind/create-fetcher/commit/c1a747e84e3c65d2b31c5a1862a519e39469f6c3))
+
 ### [0.5.3](https://github.com/rocwind/create-fetcher/compare/v0.5.2...v0.5.3) (2021-04-20)
 
 
