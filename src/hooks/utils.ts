@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, MutableRefObject } from 'react';
+import { useRef, useState, useCallback, MutableRefObject, useEffect } from 'react';
 import debounce from 'lodash.debounce';
 import isEqual from 'fast-deep-equal';
 
@@ -56,10 +56,15 @@ export function isDeepEqual<T>(value1: T, value2: T): boolean {
  */
 export function useShallowEqualMemo<T>(value: T): T {
     const ref = useRef<T>();
-    if (!isShallowEqual(value, ref.current)) {
-        ref.current = value;
-    }
-    return ref.current;
+
+    const isEqual = isShallowEqual(value, ref.current);
+    useEffect(() => {
+        if (!isEqual) {
+            ref.current = value;
+        }
+    }, [value, isEqual]);
+
+    return isEqual ? ref.current : value;
 }
 
 /**
@@ -69,10 +74,15 @@ export function useShallowEqualMemo<T>(value: T): T {
  */
 export function useDeepEqualMemo<T>(value: T): T {
     const ref = useRef<T>();
-    if (!isDeepEqual(value, ref.current)) {
-        ref.current = value;
-    }
-    return ref.current;
+
+    const isEqual = isDeepEqual(value, ref.current);
+    useEffect(() => {
+        if (!isEqual) {
+            ref.current = value;
+        }
+    }, [value, isEqual]);
+
+    return isEqual ? ref.current : value;
 }
 
 /**

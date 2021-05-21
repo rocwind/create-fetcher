@@ -41,7 +41,7 @@ Please check out [example project(react)](examples/react) for a usage demo.
 * `useSWR(fetcher, request, options)`, `createSWRHook(fetcher)`, `useSWRHookCreator(fetcher)`: basic request hook that supports caching, retry on failure
 * `usePolling(fetcher, pollingWaitTime, request, options)`, `createPollingHook(fetcher, pollingWaitTime)`, `usePollingHookCreator(fetcher, pollingWaitTime)`: polling request hook
 * `usePaginationList(fetcher, listExtractor, nextRequestCreator, initialRequest, options)`, `createPaginationListHook(fetcher, listExtractor, nextRequestCreator)`, `usePaginationListHookCreator(fetcher, listExtractor, nextRequestCreator)`: for making pagination list request calls and merges the results into a single list
-*
+* `useDeepEqualMemo(value)`, `useShallowEqualMemo(value)`: for keep using previous value instance if new value equals with previous value
 
 ### Caches (lib/caches)
 * `createMemoryCache()`: in-memory cache
