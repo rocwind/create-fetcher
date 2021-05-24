@@ -62,7 +62,7 @@ export function useShallowEqualMemo<T>(value: T): T {
         if (!isEqual) {
             ref.current = value;
         }
-    }, [value, isEqual]);
+    });
 
     return isEqual ? ref.current : value;
 }
@@ -80,7 +80,7 @@ export function useDeepEqualMemo<T>(value: T): T {
         if (!isEqual) {
             ref.current = value;
         }
-    }, [value, isEqual]);
+    });
 
     return isEqual ? ref.current : value;
 }
