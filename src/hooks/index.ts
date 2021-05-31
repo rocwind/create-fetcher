@@ -1,4 +1,10 @@
 export * from './swr';
 export * from './polling';
 export * from './pagination';
-export { useDeepEqualMemo, useShallowEqualMemo } from './utils';
+export {
+    useRerender,
+    isShallowEqual,
+    useShallowEqualMemo,
+    isDeepEqual,
+    useDeepEqualMemo,
+} from './utils';

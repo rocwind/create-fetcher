@@ -11,6 +11,12 @@ function is(x: unknown, y: unknown): boolean {
     }
 }
 
+/**
+ * shallow equal - object and its properties - compare
+ * @param objA
+ * @param objB
+ * @returns
+ */
 // https://github.com/reduxjs/react-redux/blob/master/src/utils/shallowEqual.js
 export function isShallowEqual<T>(objA: T, objB: T): boolean {
     if (is(objA, objB)) return true;
@@ -45,6 +51,12 @@ export function isEqualForKeys<T extends {}>(objA: T, objB: T, keys: (keyof T)[]
     return true;
 }
 
+/**
+ * deep equal compare
+ * @param value1
+ * @param value2
+ * @returns
+ */
 export function isDeepEqual<T>(value1: T, value2: T): boolean {
     return isEqual(value1, value2);
 }
@@ -86,7 +98,7 @@ export function useDeepEqualMemo<T>(value: T): T {
 }
 
 /**
- * hack rerender trigger
+ * component rerender trigger
  */
 export function useRerender(): () => void {
     const rerender = useState(null)[1];
