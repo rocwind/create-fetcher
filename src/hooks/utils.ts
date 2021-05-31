@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, MutableRefObject, useLayoutEffect } from 'react';
+import { useRef, useState, useCallback, MutableRefObject, useEffect } from 'react';
 import debounce from 'lodash.debounce';
 import isEqual from 'fast-deep-equal';
 
@@ -70,7 +70,7 @@ export function useShallowEqualMemo<T>(value: T): T {
     const ref = useRef<T>();
 
     const isEqual = isShallowEqual(value, ref.current);
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (!isEqual) {
             ref.current = value;
         }
@@ -88,7 +88,7 @@ export function useDeepEqualMemo<T>(value: T): T {
     const ref = useRef<T>();
 
     const isEqual = isDeepEqual(value, ref.current);
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (!isEqual) {
             ref.current = value;
         }
