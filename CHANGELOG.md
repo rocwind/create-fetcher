@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.5](https://github.com/rocwind/create-fetcher/compare/v0.5.4...v0.5.5) (2021-05-31)
+
+
+### Bug Fixes
+
+* **deps:** update jest, ts-jest to v27 ([bf0f295](https://github.com/rocwind/create-fetcher/commit/bf0f295bfda081a94dbcacf6061e75fbc6eb946a))
+* **deps:** update object-hash to 2.2.0 ([577a3f4](https://github.com/rocwind/create-fetcher/commit/577a3f432b714bc74c017fc5acd94faf45b11332))
+* export react utiles useRerender(), isDeepEqual(), isShallowEqual() ([8466119](https://github.com/rocwind/create-fetcher/commit/84661192bf848fe6ef0861442960515a367e51a2))
+* replace useEffect with useLayoutEffect for memo hooks ([3e5df10](https://github.com/rocwind/create-fetcher/commit/3e5df104a2969b7eebde84e0af4fc674ee98665a))
+
 ### [0.5.4](https://github.com/rocwind/create-fetcher/compare/v0.5.3...v0.5.4) (2021-05-21)
 
 
