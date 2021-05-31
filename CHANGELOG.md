@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.6](https://github.com/rocwind/create-fetcher/compare/v0.5.5...v0.5.6) (2021-05-31)
+
+
+### Bug Fixes
+
+* revert "replace useEffect with useLayoutEffect for memo hooks" ([9c6eca2](https://github.com/rocwind/create-fetcher/commit/9c6eca2bd4076a383f4ce98d65a1c341b1348b6d))
+
 ### [0.5.5](https://github.com/rocwind/create-fetcher/compare/v0.5.4...v0.5.5) (2021-05-31)
 
 
