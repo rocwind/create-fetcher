@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
+import { AbortErrorName } from '../requests/utils';
 import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
 import { useDeepEqualMemo, useHookStateRef, useShallowEqualMemo, isEqualForKeys } from './utils';
@@ -120,12 +121,16 @@ export function useSWR<T, R = void>(
                     // loaded: any data available or validated
                     const isLoaded = currentData !== undefined || isFreshOrValidated;
 
-                    updateState({
-                        data: data ?? stateRef.current.data,
-                        error,
-                        isLoaded,
-                        isFreshOrValidated,
-                    });
+                    // do not handle abort error because
+                    // it is triggered by client side abort() call or component unmount abort()
+                    if (error?.name !== AbortErrorName) {
+                        updateState({
+                            data: data ?? stateRef.current.data,
+                            error,
+                            isLoaded,
+                            isFreshOrValidated,
+                        });
+                    }
 
                     if (!next && abortRef.current === thisAbort) {
                         // clear abort if request fully settled
