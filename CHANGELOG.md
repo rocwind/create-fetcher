@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.7](https://github.com/rocwind/create-fetcher/compare/v0.5.6...v0.5.7) (2021-06-03)
+
+
+### Bug Fixes
+
+* **hooks:** ignore abort error when update hooks state on error ([0c15a87](https://github.com/rocwind/create-fetcher/commit/0c15a87213121c242a582bc7186d251dbb9562b9))
+
 ### [0.5.6](https://github.com/rocwind/create-fetcher/compare/v0.5.5...v0.5.6) (2021-05-31)
 
 
