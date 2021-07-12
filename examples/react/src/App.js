@@ -69,7 +69,11 @@ function App() {
     /**
      * basic swr use
      */
-    const { data: swr, refresh, isFreshOrValidated } = useSWR(timestampFetcher, null, {
+    const {
+        data: swr,
+        refresh,
+        isFreshOrValidated,
+    } = useSWR(timestampFetcher, null, {
         retryTimes: 3,
     });
     /**
@@ -81,7 +85,12 @@ function App() {
     /**
      * polling for data updates each 2 seconds
      */
-    const { data: polling, isPolling, start, stop } = usePolling(timestampFetcher, 2, null, {
+    const {
+        data: polling,
+        isPolling,
+        start,
+        stop,
+    } = usePolling(timestampFetcher, 2, null, {
         manualStart: true,
     });
 
@@ -104,9 +113,14 @@ function App() {
     /**
      * use the pagination list hook
      */
-    const { list, isLoading, hasMore, loadMore, refresh: refreshList } = usePaginationListHook(
-        paginationInitialRequest,
-    );
+    const {
+        list,
+        isLoading,
+        isRefreshing,
+        hasMore,
+        loadMore,
+        refresh: refreshList,
+    } = usePaginationListHook(paginationInitialRequest);
 
     return (
         <table>
@@ -134,7 +148,7 @@ function App() {
                 />
                 <DemoBoard
                     title={'usePaginationList()'}
-                    data={JSON.stringify({ list, hasMore, isLoading })}
+                    data={JSON.stringify({ list, hasMore, isLoading, isRefreshing })}
                     buttons={[
                         { title: 'loadMore', onClick: () => loadMore() },
                         { title: 'refresh', onClick: () => refreshList() },

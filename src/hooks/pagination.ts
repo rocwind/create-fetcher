@@ -25,9 +25,13 @@ export interface PaginationListState<L, T> {
      */
     error?: Error;
     /**
-     *
+     * is loading data - true for both refreshing and loading more
      */
     isLoading: boolean;
+    /**
+     * is refreshing data - true for refreshing
+     */
+    isRefreshing: boolean;
     /**
      * there is still more list items to load or not
      */
@@ -74,6 +78,7 @@ export function usePaginationList<L, T, R>(
         {
             list: [],
             isLoading: false,
+            isRefreshing: false,
             hasMore: true,
         } as PaginationListState<L, T>,
     );
@@ -93,6 +98,7 @@ export function usePaginationList<L, T, R>(
                 list: [],
                 error: undefined,
                 isLoading: false,
+                isRefreshing: false,
                 hasMore: true,
             });
         }
@@ -115,6 +121,9 @@ export function usePaginationList<L, T, R>(
             // reset state and request on refresh
             if (isRefresh) {
                 resetState();
+                updateState({
+                    isRefreshing: true,
+                });
                 nextRequestRef.current = initialRequestMemo;
             }
 
@@ -158,6 +167,7 @@ export function usePaginationList<L, T, R>(
                         // no longer loading
                         updateState({
                             isLoading: false,
+                            isRefreshing: false,
                         });
 
                         // populate nextRequest on success request
