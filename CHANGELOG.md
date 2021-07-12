@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.8](https://github.com/rocwind/create-fetcher/compare/v0.5.7...v0.5.8) (2021-07-12)
+
+
+### Features
+
+* add isRefreshing state to usePaginationList() ([2a883cb](https://github.com/rocwind/create-fetcher/commit/2a883cb41b7c10a1a7d06c8c776d92f763262774))
+
+
+### Bug Fixes
+
+* implement useRerender() by useReducer() ([9ca17eb](https://github.com/rocwind/create-fetcher/commit/9ca17ebdebc3749e36028f2dcfb0892c8164a788))
+
 ### [0.5.7](https://github.com/rocwind/create-fetcher/compare/v0.5.6...v0.5.7) (2021-06-03)
 
 
