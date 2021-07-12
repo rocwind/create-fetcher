@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, MutableRefObject, useEffect } from 'react';
+import { useRef, useState, useCallback, MutableRefObject, useEffect, useReducer } from 'react';
 import debounce from 'lodash.debounce';
 import isEqual from 'fast-deep-equal';
 
@@ -101,10 +101,8 @@ export function useDeepEqualMemo<T>(value: T): T {
  * component rerender trigger
  */
 export function useRerender(): () => void {
-    const rerender = useState(null)[1];
-    return useCallback(() => {
-        rerender({});
-    }, [rerender]);
+    const [, rerender] = useReducer((state) => state + 1, 0);
+    return rerender;
 }
 
 // delay the update by 34 ms(2 frames at 60fps) to render new state
