@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { AbortErrorName } from '../requests/utils';
 import { Fetcher, RequestOptions, CacheMode } from '../types';
 import { forEachResponse } from '../utils';
+import { getURLFetcher } from './fetcher';
 import { useDeepEqualMemo, useHookStateRef, useShallowEqualMemo, isEqualForKeys } from './utils';
 
 export interface SWROptions extends Omit<RequestOptions, 'pollingWaitTime'> {
@@ -48,7 +49,13 @@ function getSWRCacheModePriority(cacheMode?: CacheMode) {
             return 0;
     }
 }
-
+/**
+ * Send request and return data in SWR way
+ * @param url url to fetch
+ * @request request options
+ * @options swr options
+ */
+export function useSWR<T>(url: string, request?: RequestInit, options?: SWROptions): SWRState<T>;
 /**
  * Send request and return data in SWR way
  * @param fetcher fetcher used
@@ -59,7 +66,16 @@ export function useSWR<T, R = void>(
     fetcher: Fetcher<T, R>,
     request?: R,
     options?: SWROptions,
+): SWRState<T>;
+
+export function useSWR<T, R = void>(
+    fetcherOrURL: Fetcher<T, R> | string,
+    request?: R,
+    options?: SWROptions,
 ): SWRState<T> {
+    const fetcher =
+        typeof fetcherOrURL === 'string' ? getURLFetcher<T>(fetcherOrURL) : fetcherOrURL;
+
     const requestMemo = useDeepEqualMemo(request);
     const optionsMemo = useShallowEqualMemo(options);
 

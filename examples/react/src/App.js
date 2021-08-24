@@ -122,6 +122,7 @@ function App() {
         refresh: refreshList,
     } = usePaginationListHook(paginationInitialRequest);
 
+    const { data: swr3 } = useSWR('https://jsonplaceholder.typicode.com/todos/1');
     return (
         <table>
             <tbody>
@@ -138,6 +139,10 @@ function App() {
                     ]}
                 />
                 <DemoBoard title={'followed useSWR()'} data={swr2} />
+                <DemoBoard
+                    title={"useSWR('https://jsonplaceholder.typicode.com/todos/1')"}
+                    data={JSON.stringify(swr3)}
+                />
                 <DemoBoard
                     title={'usePolling()'}
                     data={JSON.stringify({ data: polling, isPolling })}

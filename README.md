@@ -5,7 +5,7 @@ create-fetcher is a remote data fetching library, providing common features - co
 `npm i --save create-fetcher`
 
 ## Why fetcher?
-`create-fetcher` is built around the standard [`fetch()`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch), the goal of this library is not trying to replace `fetch()` (like `axios`), but to provide common utilities around the remote data fetching:
+`create-fetcher` is built around the standard [`fetch()`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch), the goal of this library is not trying to replace `fetch()`, but to provide common utilities around the remote data fetching:
 - configurable caching strategies: [cache mode](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache) and `maxAge`, `minFresh`
 - configurable cache stores: memory cache, local storage cache, async storage cache(react-native) or any custom cache stores that implement the `Cache` interface
 - retry on failure
@@ -17,14 +17,25 @@ create-fetcher is a remote data fetching library, providing common features - co
 * `fetcher`: object instance that responsible for making fetch calls, the reason it is need to be a object is for concurrency control
 
 ```
+// quick start
+import { useSWR } from 'create-fetcher/lib/hooks';
+
+function MyComponent1() {
+    // send request by useSWR
+    const { data } = useSWR('https://jsonplaceholder.typicode.com/todos/1');
+    return (<div>{JSON.stringify(data)}</div>);
+}
+
+
+// create the fetcher instance to gain more control on cache and fetcher options
 import { createFetcher } from 'create-fetcher';
 import { useSWR } from 'create-fetcher/lib/hooks';
 
 // create the fetcher instance, pass signal to fetch so it supports fully abort() the request
 // otherwise calling abort() on `fetcher.fetch()` returns only aborts at application side (ignores request result).
-const userInfoFetcher = createFetcher((id, { signal }) => fetch(`/api/v1/users/${id}`, { signal }));
+const userInfoFetcher = createFetcher((id, { signal }) => fetch(`/api/v1/users/${id}`, { signal }), { cacheMaxAge: 7200 });
 
-function MyComponent() {
+function MyComponent2() {
     // send request by useSWR with 1 as the id, and get the fetch result
     const { data } = useSWR(userInfoFetcher, 1);
     return (<div>{JSON.stringify(data)}</div>);
@@ -35,10 +46,11 @@ Please check out [example project(react)](examples/react) for a usage demo.
 
 ## API List (please use the TypeScript docs for more details)
 
+* `createFetcher(url, options)`: create a fetcher instance
 * `createFetcher(requestCreator, options)`: create a fetcher instance
 
 ### React Hooks (lib/hooks)
-* `useSWR(fetcher, request, options)`, `createSWRHook(fetcher)`, `useSWRHookCreator(fetcher)`: basic request hook that supports caching, retry on failure
+* `useSWR(url, request, options)`, `useSWR(fetcher, request, options)`, `createSWRHook(fetcher)`, `useSWRHookCreator(fetcher)`: basic request hook that supports caching, retry on failure
 * `usePolling(fetcher, pollingWaitTime, request, options)`, `createPollingHook(fetcher, pollingWaitTime)`, `usePollingHookCreator(fetcher, pollingWaitTime)`: polling request hook
 * `usePaginationList(fetcher, listExtractor, nextRequestCreator, initialRequest, options)`, `createPaginationListHook(fetcher, listExtractor, nextRequestCreator)`, `usePaginationListHookCreator(fetcher, listExtractor, nextRequestCreator)`: for making pagination list request calls and merges the results into a single list
 * `useDeepEqualMemo(value)`, `useShallowEqualMemo(value)`: for keep using previous value instance if new value equals with previous value

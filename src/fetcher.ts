@@ -29,12 +29,12 @@ export class FetcherImpl<T, R = void> implements Fetcher<T, R> {
     private options = Object.assign({}, defaultFetcherOptions, { cache: createMemoryCache() });
     private requestFactory: RequestFactory<T, R>;
     private ongoingClearCache = Promise.resolve();
-    constructor(requestCreator: RequestCreator<T, R>, options: FetcherOptions) {
+    constructor(requestCreator: RequestCreator<T, R>, options?: FetcherOptions) {
         this.config(options);
         this.requestFactory = new RequestFactory(requestCreator);
     }
 
-    config(options) {
+    config(options?: FetcherOptions) {
         Object.assign(this.options, options);
     }
 

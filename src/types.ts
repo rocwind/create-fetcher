@@ -106,7 +106,7 @@ export interface FetcherOptions {
      */
     cacheMinFresh?: number;
     /**
-     * max amount of time of a cache is considered fresh, default to 3600s
+     * max amount of time of a cache is considered valid, default to 3600s
      */
     cacheMaxAge?: number;
     /**
