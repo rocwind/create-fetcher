@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.9](https://github.com/rocwind/create-fetcher/compare/v0.5.8...v0.5.9) (2021-08-24)
+
+
+### Features
+
+* support using url directly for createFetcher() and useSWR() ([949b54c](https://github.com/rocwind/create-fetcher/commit/949b54c1b8f9184d9ceac65df8f8bce1f6831cd5))
+
 ### [0.5.8](https://github.com/rocwind/create-fetcher/compare/v0.5.7...v0.5.8) (2021-07-12)
 
 
