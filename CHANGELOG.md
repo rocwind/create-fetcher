@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/rocwind/create-fetcher/compare/v0.5.9...v0.6.0) (2021-09-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove `createXXXHook()` and `useXXXCreator()` hooks
+
+### Features
+
+* support using url for usePolling() hook ([f748ab3](https://github.com/rocwind/create-fetcher/commit/f748ab3fef61f9ac478c402f63fbbe41e2fd3e4e))
+* usePaginationList() supports using anonymouse listExtractor, nextRequestCreator ([137ccdc](https://github.com/rocwind/create-fetcher/commit/137ccdc11f0a6e0482aa9d3b46a878a2dc57fb21))
+
+
+* usePaginationList() hook takes a DataHandler replace previous ListExtractor and NextRequestCreator params ([5fb5d4e](https://github.com/rocwind/create-fetcher/commit/5fb5d4e19b77c729d75f53dfd80d15efdfc78b64))
+
 ### [0.5.9](https://github.com/rocwind/create-fetcher/compare/v0.5.8...v0.5.9) (2021-08-24)
 
 
