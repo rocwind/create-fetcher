@@ -48,13 +48,21 @@ export interface PaginationListState<L, T> {
 }
 
 /**
- * extract list from received data
+ * extract list and create next request from received data + previous request
  */
-export type ListExtractor<T, L> = (data: T) => L[];
-/**
- * create next request by previous request and data, return null if it reaches end
- */
-export type NextRequestCreator<T, R> = (prevData: T, prevRequest?: R) => R;
+export type DataHandler<L, T, R> = (
+    data: T,
+    prevRequest?: R,
+) => {
+    /**
+     * list extracted from response data
+     */
+    list: L[];
+    /**
+     * next request, null if it reaches end of the list
+     */
+    nextRequest: R | null;
+};
 
 /**
  *
@@ -66,19 +74,16 @@ export type NextRequestCreator<T, R> = (prevData: T, prevRequest?: R) => R;
  */
 export function usePaginationList<L, T, R>(
     fetcher: Fetcher<T, R>,
-    listExtractor: ListExtractor<T, L>,
-    nextRequestCreator: NextRequestCreator<T, R>,
+    dataHandler: DataHandler<L, T, R>,
     initialRequest?: R,
     options?: PaginationListOptions,
 ): PaginationListState<L, T> {
     const initialRequestMemo = useDeepEqualMemo(initialRequest);
     const optionsMemo = useShallowEqualMemo(options);
 
-    const listExtractorRef = useRef(listExtractor);
-    const nextRequestCreatorRef = useRef(nextRequestCreator);
+    const dataHandlerRef = useRef(dataHandler);
     useEffect(() => {
-        listExtractorRef.current = listExtractor;
-        nextRequestCreatorRef.current = nextRequestCreator;
+        dataHandlerRef.current = dataHandler;
     });
 
     const [state, stateRef, updateState, cancelUpdate] = useHookStateRef<PaginationListState<L, T>>(
@@ -154,8 +159,12 @@ export function usePaginationList<L, T, R>(
             const thisAbort = forEachResponse(
                 fetcher.fetch(nextRequestRef.current, mergedOptions),
                 ({ data, error, next }) => {
+                    let nextRequest: R | null = null;
                     if (data !== undefined) {
-                        const pageList = listExtractorRef.current(data);
+                        const result = dataHandlerRef.current(data, nextRequestRef.current);
+                        nextRequest = result.nextRequest;
+
+                        const pageList = result.list;
                         const prevList = stateRef.current.list;
                         const list = isInitialPage ? pageList : prevList.concat(pageList);
                         // compare if it changed before we update the list
@@ -179,10 +188,7 @@ export function usePaginationList<L, T, R>(
 
                         // populate nextRequest on success request
                         if (!error) {
-                            nextRequestRef.current = nextRequestCreatorRef.current(
-                                data,
-                                nextRequestRef.current,
-                            );
+                            nextRequestRef.current = nextRequest;
 
                             // it still has more if there is nextRequest
                             updateState({
@@ -236,31 +242,4 @@ export function usePaginationList<L, T, R>(
         };
     }, [loadMore, cancelUpdate, initialRequestMemo, optionsMemo]);
     return state;
-}
-
-export function createPaginationListHook<L, T, R>(
-    fetcher: Fetcher<T, R>,
-    listExtractor: ListExtractor<T, L>,
-    nextRequestCreator: NextRequestCreator<T, R>,
-) {
-    return function usePaginationListWrapper(initialRequest?: R, options?: PaginationListOptions) {
-        return usePaginationList(
-            fetcher,
-            listExtractor,
-            nextRequestCreator,
-            initialRequest,
-            options,
-        );
-    };
-}
-
-export function usePaginationListHookCreator<L, T, R>(
-    fetcher: Fetcher<T, R>,
-    listExtractor: ListExtractor<T, L>,
-    nextRequestCreator: NextRequestCreator<T, R>,
-) {
-    const [result] = useState(() => {
-        return createPaginationListHook(fetcher, listExtractor, nextRequestCreator);
-    });
-    return result;
 }

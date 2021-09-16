@@ -194,14 +194,3 @@ export function useSWR<T, R = void>(
 
     return state;
 }
-
-export function createSWRHook<T, R = void>(fetcher: Fetcher<T, R>) {
-    return function useSWRWrapper(request?: R, options?: SWROptions) {
-        return useSWR(fetcher, request, options);
-    };
-}
-
-export function useSWRHookCreator<T, R = void>(fetcher: Fetcher<T, R>) {
-    const [result] = useState(() => createSWRHook(fetcher));
-    return result;
-}

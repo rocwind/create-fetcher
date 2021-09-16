@@ -137,17 +137,3 @@ export function usePolling<T, R = void>(
 
     return stateRef.current;
 }
-
-export function createPollingHook<T, R = void>(fetcher: Fetcher<T, R>, pollingWaitTime: number) {
-    return function usePollingWrapper(request?: R, options?: PollingOptions) {
-        return usePolling(fetcher, pollingWaitTime, request, options);
-    };
-}
-
-export function usePollingHookCreator<T, R = void>(
-    fetcher: Fetcher<T, R>,
-    pollingWaitTime: number,
-) {
-    const [result] = useState(() => createPollingHook(fetcher, pollingWaitTime));
-    return result;
-}

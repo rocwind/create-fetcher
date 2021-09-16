@@ -1,11 +1,6 @@
 import React from 'react';
 import { createFetcher, CacheMode } from 'create-fetcher';
-import {
-    useSWR,
-    usePolling,
-    usePaginationListHookCreator,
-    useSWRHookCreator,
-} from 'create-fetcher/lib/hooks';
+import { useSWR, usePolling, usePaginationList } from 'create-fetcher/lib/hooks';
 import { createLocalStorageCache } from 'create-fetcher/lib/caches/localStorage';
 import { useReducer } from 'react';
 
@@ -79,7 +74,7 @@ function App() {
     /**
      * only auto request when previous (swr) is ready and result is fresh
      */
-    const { data: swr2 } = useSWRHookCreator(echoFetcher)(swr, {
+    const { data: swr2 } = useSWR(echoFetcher, swr, {
         manualStart: !isFreshOrValidated,
     });
     /**
@@ -94,19 +89,6 @@ function App() {
         manualStart: true,
     });
 
-    /**
-     * pagination list hook by use its creator
-     */
-    const usePaginationListHook = usePaginationListHookCreator(
-        listFetcher,
-        (result) => [result],
-        (result, prevRequest) => {
-            if (prevRequest < 10) {
-                return prevRequest + 1;
-            }
-            return null;
-        },
-    );
     const [paginationInitialRequest, togglePaginationInitialRequest] = useReducer((state) => {
         return state ? 0 : 1;
     }, 0);
@@ -120,7 +102,16 @@ function App() {
         hasMore,
         loadMore,
         refresh: refreshList,
-    } = usePaginationListHook(paginationInitialRequest);
+    } = usePaginationList(
+        listFetcher,
+        (result, prevRequest) => {
+            return {
+                list: [result],
+                nextRequest: prevRequest < 10 ? prevRequest + 1 : null,
+            };
+        },
+        paginationInitialRequest,
+    );
 
     const { data: swr3 } = useSWR('https://jsonplaceholder.typicode.com/todos/1');
     return (
