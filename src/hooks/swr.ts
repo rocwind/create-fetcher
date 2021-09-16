@@ -52,7 +52,7 @@ function getSWRCacheModePriority(cacheMode?: CacheMode) {
 /**
  * Send request and return data in SWR way
  * @param url url to fetch
- * @request request options
+ * @request fetch() options
  * @options swr options
  */
 export function useSWR<T>(url: string, request?: RequestInit, options?: SWROptions): SWRState<T>;
@@ -60,7 +60,7 @@ export function useSWR<T>(url: string, request?: RequestInit, options?: SWROptio
  * Send request and return data in SWR way
  * @param fetcher fetcher used
  * @param request request params
- * @param options
+ * @param options swr options
  */
 export function useSWR<T, R = void>(
     fetcher: Fetcher<T, R>,
@@ -68,6 +68,7 @@ export function useSWR<T, R = void>(
     options?: SWROptions,
 ): SWRState<T>;
 
+// implementation
 export function useSWR<T, R = void>(
     fetcherOrURL: Fetcher<T, R> | string,
     request?: R,

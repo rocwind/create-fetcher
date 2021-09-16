@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Fetcher, RequestOptions } from '../types';
 import { forEachResponse } from '../utils';
+import { getURLFetcher } from './fetcher';
 import { useDeepEqualMemo, useRerender, useShallowEqualMemo } from './utils';
 
 export interface PollingOptions extends Omit<RequestOptions, 'pollingWaitTime'> {
@@ -28,18 +29,42 @@ export interface PollingState<T> {
 }
 
 /**
- * Send poling requests
+ * Send polling requests
+ * @param url url used for polling
+ * @param pollingWaitTime wait time between polling requests in seconds
+ * @param request fetch() options
+ * @param options polling
+ */
+export function usePolling<T>(
+    url: string,
+    pollingWaitTime: number,
+    request?: RequestInit,
+    options?: PollingOptions,
+): PollingState<T>;
+
+/**
+ * Send polling requests
  * @param fetcher fetcher used for polling requests
- * @param pollingWaitTime wait time between polling requests
+ * @param pollingWaitTime wait time between polling requests in seconds
  * @param request request params
- * @param options request options
+ * @param options polling options
  */
 export function usePolling<T, R = void>(
     fetcher: Fetcher<T, R>,
     pollingWaitTime: number,
     request?: R,
     options?: PollingOptions,
+);
+
+// implementation
+export function usePolling<T, R = void>(
+    fetcherOrURL: Fetcher<T, R> | string,
+    pollingWaitTime: number,
+    request?: R,
+    options?: PollingOptions,
 ): PollingState<T> {
+    const fetcher =
+        typeof fetcherOrURL === 'string' ? getURLFetcher<T>(fetcherOrURL) : fetcherOrURL;
     const requestMemo = useDeepEqualMemo(request);
     const optionsMemo = useShallowEqualMemo(options);
 
