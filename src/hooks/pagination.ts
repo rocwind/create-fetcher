@@ -74,6 +74,13 @@ export function usePaginationList<L, T, R>(
     const initialRequestMemo = useDeepEqualMemo(initialRequest);
     const optionsMemo = useShallowEqualMemo(options);
 
+    const listExtractorRef = useRef(listExtractor);
+    const nextRequestCreatorRef = useRef(nextRequestCreator);
+    useEffect(() => {
+        listExtractorRef.current = listExtractor;
+        nextRequestCreatorRef.current = nextRequestCreator;
+    });
+
     const [state, stateRef, updateState, cancelUpdate] = useHookStateRef<PaginationListState<L, T>>(
         {
             list: [],
@@ -148,7 +155,7 @@ export function usePaginationList<L, T, R>(
                 fetcher.fetch(nextRequestRef.current, mergedOptions),
                 ({ data, error, next }) => {
                     if (data !== undefined) {
-                        const pageList = listExtractor(data);
+                        const pageList = listExtractorRef.current(data);
                         const prevList = stateRef.current.list;
                         const list = isInitialPage ? pageList : prevList.concat(pageList);
                         // compare if it changed before we update the list
@@ -172,7 +179,7 @@ export function usePaginationList<L, T, R>(
 
                         // populate nextRequest on success request
                         if (!error) {
-                            nextRequestRef.current = nextRequestCreator(
+                            nextRequestRef.current = nextRequestCreatorRef.current(
                                 data,
                                 nextRequestRef.current,
                             );
@@ -200,7 +207,7 @@ export function usePaginationList<L, T, R>(
             );
             abortRef.current = thisAbort;
         },
-        [resetState, listExtractor, nextRequestCreator, initialRequestMemo, optionsMemo],
+        [resetState, initialRequestMemo, optionsMemo],
     );
 
     const loadMore = useCallback(() => {
