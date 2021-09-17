@@ -20,7 +20,7 @@ export function createFetcher<T>(
  */
 export function createFetcher<T, R = void>(
     requestCreator: RequestCreator<T, R>,
-    options: FetcherOptions,
+    options?: FetcherOptions,
 ): Fetcher<T, R>;
 
 export function createFetcher<T, R = void>(
