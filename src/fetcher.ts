@@ -6,7 +6,6 @@ import {
     RequestOptions,
     Cache,
     BackoffMode,
-    Logger,
     CachedData,
 } from './types';
 import { createMemoryCache } from './caches/memory';

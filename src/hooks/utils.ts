@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, MutableRefObject, useEffect, useReducer } from 'react';
+import { useRef, useCallback, MutableRefObject, useEffect, useReducer } from 'react';
 import debounce from 'lodash.debounce';
 import isEqual from 'fast-deep-equal';
 

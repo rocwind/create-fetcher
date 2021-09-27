@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { Fetcher, RequestOptions } from '../types';
 import { forEachResponse } from '../utils';
 import { getURLFetcher } from './fetcher';
