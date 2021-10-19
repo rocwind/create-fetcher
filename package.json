@@ -43,7 +43,7 @@
     "@types/object-hash": "2.2.1",
     "@types/react": "17.0.30",
     "concurrently": "6.3.0",
-    "jest": "27.2.5",
+    "jest": "27.3.0",
     "msf-cli": "1.2.3",
     "react": "17.0.2",
     "standard-version": "9.3.2",
