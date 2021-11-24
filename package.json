@@ -41,7 +41,7 @@
     "@types/lodash.debounce": "4.0.6",
     "@types/lodash.isequal": "4.5.5",
     "@types/object-hash": "2.2.1",
-    "@types/react": "17.0.36",
+    "@types/react": "17.0.37",
     "concurrently": "6.4.0",
     "jest": "27.3.1",
     "msf-cli": "1.2.3",
