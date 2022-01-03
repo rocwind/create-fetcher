@@ -42,7 +42,7 @@
     "@types/lodash.isequal": "4.5.5",
     "@types/object-hash": "2.2.1",
     "@types/react": "17.0.38",
-    "concurrently": "6.5.1",
+    "concurrently": "7.0.0",
     "jest": "27.4.5",
     "msf-cli": "1.2.4",
     "react": "17.0.2",
