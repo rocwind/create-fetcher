@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.1](https://github.com/rocwind/create-fetcher/compare/v0.6.0...v0.6.1) (2022-01-10)
+
+
+### Features
+
+* add `fromCache` to response to tell if current data is from cache or not ([84c280c](https://github.com/rocwind/create-fetcher/commit/84c280ce463747b5ee2c97d15ab847b3a401847d))
+
+
+### Bug Fixes
+
+* allows options being omitted in createFetcher() with requestCreator ([a77afa9](https://github.com/rocwind/create-fetcher/commit/a77afa9bf9d06d8a54165907c9c0ae02f57da343))
+
 ## [0.6.0](https://github.com/rocwind/create-fetcher/compare/v0.5.9...v0.6.0) (2021-09-16)
 
 
