@@ -43,6 +43,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
 
             const response: RequestResponse<T> = {
                 data,
+                fromCache: true,
             };
 
             // check if cache is fresh and send request if it's not
@@ -82,7 +83,7 @@ export class SWRFetcherRequest<T, R> implements FetcherRequest<T> {
                     }
 
                     this.logger?.('fetch from remote success');
-                    nextResolve({ data });
+                    nextResolve({ data, fromCache: false });
                 })
                 .catch((error) => {
                     this.isRequestSent = false;

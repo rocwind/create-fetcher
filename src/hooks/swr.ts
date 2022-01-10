@@ -13,6 +13,7 @@ export interface SWROptions extends Omit<RequestOptions, 'pollingWaitTime'> {
 }
 export interface SWRState<T> {
     data?: T;
+    fromCache?: boolean;
     error?: Error;
     /**
      * is initial data loaded, it may come from cache
@@ -129,7 +130,7 @@ export function useSWR<T, R = void>(
             lastOptionsRef.current = mergedOptions;
             const thisAbort = forEachResponse(
                 fetcher.fetch(requestMemo, mergedOptions),
-                ({ data, error, next }) => {
+                ({ data, fromCache, error, next }) => {
                     // isFreshOrValidated: no next request
                     const isFreshOrValidated = !next;
                     // current state
@@ -143,6 +144,7 @@ export function useSWR<T, R = void>(
                     if (error?.name !== AbortErrorName) {
                         updateState({
                             data: data ?? stateRef.current.data,
+                            fromCache,
                             error,
                             isLoaded,
                             isFreshOrValidated,

@@ -74,7 +74,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
                             Object.assign({}, this.options, { cacheMode: CacheMode.NoCache }),
                             this.request,
                         );
-                        this.innerRequest.run().then(({ data, error }) => {
+                        this.innerRequest.run().then(({ data, fromCache, error }) => {
                             if (this.isAborted || error?.name === AbortErrorName) {
                                 nextControls.resolve(createAbortError());
                                 return;
@@ -90,7 +90,7 @@ export class ROEFetcherRequest<T, R> implements FetcherRequest<T> {
                                 return;
                             }
 
-                            nextControls.resolve({ data });
+                            nextControls.resolve({ data, fromCache });
                         });
                     };
                     this.logger?.('retry scheduled');

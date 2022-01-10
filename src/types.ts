@@ -157,6 +157,10 @@ export interface RequestResponse<T> {
      */
     data?: T;
     /**
+     * data is from cache or not
+     */
+    fromCache?: boolean;
+    /**
      * followed up response. swr, polling
      */
     next?: Promise<RequestResponse<T>>;
