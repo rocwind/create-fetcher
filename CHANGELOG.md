@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.2](https://github.com/rocwind/create-fetcher/compare/v0.6.1...v0.6.2) (2022-02-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency object-hash to v3 ([a1fd224](https://github.com/rocwind/create-fetcher/commit/a1fd224a719452a021d35e5c356dab10c272036d))
+
 ### [0.6.1](https://github.com/rocwind/create-fetcher/compare/v0.6.0...v0.6.1) (2022-01-10)
 
 
