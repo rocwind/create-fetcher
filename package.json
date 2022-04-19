@@ -38,7 +38,7 @@
   "devDependencies": {
     "@react-native-async-storage/async-storage": "1.15.17",
     "@types/jest": "27.4.1",
-    "@types/lodash.debounce": "4.0.6",
+    "@types/lodash.debounce": "4.0.7",
     "@types/lodash.isequal": "4.5.5",
     "@types/object-hash": "2.2.1",
     "@types/react": "18.0.5",
