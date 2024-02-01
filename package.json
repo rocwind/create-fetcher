@@ -37,7 +37,7 @@
   "homepage": "https://github.com/rocwind/create-fetcher#readme",
   "devDependencies": {
     "@react-native-async-storage/async-storage": "1.21.0",
-    "@types/jest": "29.5.11",
+    "@types/jest": "29.5.12",
     "@types/lodash.debounce": "4.0.9",
     "@types/lodash.isequal": "4.5.8",
     "@types/object-hash": "2.2.1",
